@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if role == 'admin' %}Admin Dashboard{% else %}My Dashboard{% endif %} · TableFlow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="dash-wrapper">
+
+
+    <!--SIDEBAR-->
+
+    
+    <aside class="dash-sidebar">
+        <div class="dash-logo">
+            <span>TableFlow</span>
+        </div>
+
+        {% if role == 'admin' %}
+        <nav class="dash-nav">
+            <a href="{{ url_for('dashboard') }}" class="dash-nav-link active"> Overview</a>
+            <a href="{{ url_for('manage_bookings') }}" class="dash-nav-link"> Manage Bookings</a>
+            <a href="{{ url_for('manage_tables') }}" class="dash-nav-link"> Manage Tables</a>
+            <a href="#" class="dash-nav-link"> Customers</a>
+            <a href="#" class="dash-nav-link"> Reports & Stats</a>
+            <a href="#" class="dash-nav-link"> Settings</a>
+        </nav>
+        {% else %}
+        <nav class="dash-nav">
+            <a href="{{ url_for('dashboard') }}" class="dash-nav-link active"> Home</a>
+            <a href="{{ url_for('index') }}" class="dash-nav-link"> New Booking</a>
+            <a href="#" class="dash-nav-link">My Bookings</a>
+            <a href="#" class="dash-nav-link"> Favorite Restaurants</a>
+            <a href="#" class="dash-nav-link"> My Profile</a>
+        </nav>
+        {% endif %}
+
+        <div class="dash-sidebar-footer">
+            <a href="{{ url_for('index') }}" class="dash-logout"> Back to site</a>
+            <a href="{{ url_for('logout') }}" class="dash-logout"> Log out</a>
+        </div>
+    </aside>
+
+
+    <!--MAIN DASHBOARD-->>
+
+
+    <div class="dash-main">
+
+        <header class="dash-topbar">
+            <div>
+                {% if role == 'admin' %}
+                <h1>Admin Dashboard</h1>
+                <p class="dash-subtitle">Monitor and manage the restaurant's booking activity</p>
+                <a href="{{ url_for('new_booking') }}" class="btn btn-primary btn-sm dash-topbar-action">+ Book a table</a>
+                {% else %}
+                <h1>Welcome back, {{ current_user.name | default('Guest') }} </h1>
+                <p class="dash-subtitle">Manage your table reservations here</p>
+                {% endif %}
+            </div>
+            <div class="dash-user">
+                <div class="dash-avatar">{{ (current_user.name | default('G'))[0] | upper }}</div>
+                <div>
+                    <strong>{{ current_user.name | default('Guest') }}</strong>
+                    <small>{{ 'Administrator' if role == 'admin' else 'Customer' }}</small>
+                </div>
+            </div>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-stack flash-stack-inline">
+            {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% if role == 'admin' %}
+
+
+        <!--ADMIN DASHBOARD-->
+    
+
+        <section class="dash-stats">
+            <div class="stat-card">
+                <div>
+                    <p class="stat-label">Bookings today</p>
+                    <p class="stat-value">{{ stats.today_bookings | default(0) }}</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <p class="stat-label">Confirmed</p>
+                    <p class="stat-value">{{ stats.confirmed_bookings | default(0) }}</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <p class="stat-label">Pending</p>
+                    <p class="stat-value">{{ stats.pending_bookings | default(0) }}</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <p class="stat-label">Tables available</p>
+                    <p class="stat-value">{{ stats.available_tables | default(0) }}/{{ stats.total_tables | default(0) }}</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="dash-grid">
+            <!-- Recent bookings -->
+            <section class="dash-card dash-card-wide">
+                <div class="dash-card-header">
+                    <h2>Recent Bookings</h2>
+                    <a href="{{ url_for('manage_bookings') }}" class="dash-link">View all →</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="dash-table">
+                        <thead>
+                            <tr>
+                                <th>Customer</th>
+                                <th>Phone</th>
+                                <th>Date & time</th>
+                                <th>Guests</th>
+                                <th>Table</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in bookings | default([]) %}
+                            <tr>
+                                <td>{{ booking.customer_name }}</td>
+                                <td>{{ booking.phone }}</td>
+                                <td>{{ booking.date }} · {{ booking.time }}</td>
+                                <td>{{ booking.guests }}</td>
+                                <td>{{ booking.table_number }}</td>
+                                <td>
+                                    <span class="badge badge-{{ booking.status }}">
+                                        {% if booking.status == 'confirmed' %}Confirmed
+                                        {%- elif booking.status == 'pending' %}Pending
+                                        {%- else %}Cancelled{% endif %}
+                                    </span>
+                                </td>
+                                <td class="dash-actions">
+                                    {% if booking.status == 'pending' %}
+                                    <form method="post" action="{{ url_for('confirm_booking', booking_id=booking.id) }}">
+                                        <button type="submit" class="btn btn-confirm" title="Confirm">✔</button>
+                                    </form>
+                                    {% endif %}
+                                    {% if booking.status != 'cancelled' %}
+                                    <form method="post" action="{{ url_for('cancel_booking', booking_id=booking.id) }}">
+                                        <button type="submit" class="btn btn-cancel" title="Cancel">✘</button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="dash-empty">No bookings yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Table floor status -->
+            <section class="dash-card">
+                <div class="dash-card-header">
+                    <h2>Table Floor Plan</h2>
+                    <a href="{{ url_for('manage_tables') }}" class="dash-link">Manage tables →</a>
+                </div>
+                <div class="table-grid">
+                    {% for table in tables | default([]) %}
+                    <div class="table-cell table-{{ table.status }}">
+                        <span>Table {{ table.number }}</span>
+                        <small>{{ table.capacity }} seats</small>
+                    </div>
+                    {% else %}
+                    <p class="dash-empty">No table data yet.</p>
+                    {% endfor %}
+                </div>
+                <div class="table-legend">
+                    <span><i class="dot dot-available"></i>Available</span>
+                    <span><i class="dot dot-occupied"></i>Occupied</span>
+                    <span><i class="dot dot-reserved"></i>Reserved</span>
+                </div>
+            </section>
+        </div>
+
+        <div class="dash-grid">
+            <!-- New customers -->
+            <section class="dash-card">
+                <div class="dash-card-header">
+                    <h2>New Customers</h2>
+                </div>
+                <ul class="dash-list">
+                    {% for customer in new_customers | default([]) %}
+                    <li>
+                        <span class="dash-avatar small">{{ customer.name[0] | upper }}</span>
+                        <div>
+                            <strong>{{ customer.name }}</strong>
+                            <small>{{ customer.email }}</small>
+                        </div>
+                    </li>
+                    {% else %}
+                    <li class="dash-empty">No new customers yet.</li>
+                    {% endfor %}
+                </ul>
+            </section>
+
+            <!-- Weekly bookings chart -->
+            <section class="dash-card dash-card-wide">
+                <div class="dash-card-header">
+                    <h2>Bookings This Week</h2>
+                </div>
+                <div class="bar-chart">
+                    {% for day in weekly_bookings | default([]) %}
+                    <div class="bar-chart-col">
+                        <div class="bar" style="height: {{ day.percent | default(0) }}%;"></div>
+                        <small>{{ day.label }}</small>
+                    </div>
+                    {% else %}
+                    <p class="dash-empty">No statistics available yet.</p>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+
+        {% else %}
