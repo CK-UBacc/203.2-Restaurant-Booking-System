@@ -22,6 +22,9 @@ class Tables(database.Model):
     id = database.Column(database.Integer, primary_key=True)
     seats = database.Column(database.Integer)
 
+    def __repr__(self):
+        return f"{self.id}: {self.seats}"
+
 
 class Bookings(database.Model):
     __tablename__ = "bookings"
@@ -36,9 +39,20 @@ class Bookings(database.Model):
     time = database.Column(database.Time, nullable=False)
     status = database.Column(database.String(16), nullable=False)
 
-def initializeDummyDatabase(): # Crate dummy database file with dummy data in tables
-    with app.app_context():
+    def __repr__(self):
+        return f"{self.id}: {self.name}"
 
+def initializeDummyDatabase(): # Crate dummy database file with dummy data in tables
+    '''
+    Creates a dummy database for testing
+
+    Args:
+    None
+
+    Returns:
+    None
+    '''
+    with app.app_context():
         print("DROPPING EXISTING DUMMY DATA")
         database.drop_all()
         print("CREATING NEW DUMMY DATA TABLES")
@@ -88,18 +102,18 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
                 time=datetime.datetime.now().time(),
                 status="CANCELED")
         ]
+    
+        print("INSERTING DUMMY TABLES")
+        for table in dummyTables:
+            database.session.add(table)
+        print("INSERTING DUMMY BOOKINGS")
+        for booking in dummyBookings:
+            database.session.add(booking)
 
-    print("INSERTING DUMMY TABLES")
-    for table in dummyTables:
-        database.session.add(table)
-    print("INSERTING DUMMY BOOKINGS")
-    for booking in dummyBookings:
-        database.session.add(booking)
+        print("COMMITING TABLE CHANGES")
+        database.session.commit()
     
-    print("COMMITING TABLE CHANGES")
-    database.session.commit()
-    
-    print("DUMMY DATABASE INITIALIATION COMPLETE")
+        print("DUMMY DATABASE INITIALIATION COMPLETE")
 
 #-------------------------------------------------------------------------------------------------------
 # Routes
@@ -130,6 +144,10 @@ def booking(id):
     render_template: template for the booking form
     '''
     return render_template("booking.html", id=id) #I don't know if all of this will be needed but whatever.
+
+@app.route("/dashboard/<int:id>", methods=["GET"]) #NEEDS: HTML pass, code
+def dashboard(id):
+    return render_template("dashboard.html", id=id)
 
 if __name__ == "__main__":
     initializeDummyDatabase()
