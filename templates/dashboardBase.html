@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width", initial-scale="1.0">
+        <title>{% block title %}Default page title{% endblock %}</title>
+        <link rel="stylesheet" href="/static/style.css">
+    </head>
+
+    <body>
+        <nav>
+            <!-- Fill this with nav bar content that will be accross all dashboard pages -->
+
+        </nav>
+
+        <main>
+            
+            <!-- Main Dashboard content should go into their respective html file not in there-->
+            {% block content %} {% endblock %}
+        </main>
+
+        <footer>
+            <!-- Content that will be on the foot of all dashboard pages will go here -->
+
+        </footer>
+    </body>
+</html>
