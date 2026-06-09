@@ -47,9 +47,7 @@
     <!--MAIN DASHBOARD-->>
 
 
-    <main>
-
-        <header class="dash-topbar">
+    <header class="dash-topbar">
             <div>
                 {% if role == 'admin' %}
                 <h1>Admin Dashboard</h1>
@@ -67,8 +65,8 @@
                     <small>{{ 'Administrator' if role == 'admin' else 'Customer' }}</small>
                 </div>
             </div>
-        </header>
-
+    </header>
+    <main>
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         <div class="flash-stack flash-stack-inline">
@@ -236,3 +234,5 @@
         {% else %}
 
     </main>
+</body>
+</html>

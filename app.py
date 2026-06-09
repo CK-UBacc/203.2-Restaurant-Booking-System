@@ -39,7 +39,7 @@ class Bookings(database.Model):
     time = database.Column(database.Time, nullable=False)
     status = database.Column(database.String(16), nullable=False)
 
-    def __repr__(self):
+    def __repr__(self): # I don't know how to set up the __repr__
         return f"{self.id}: {self.name}"
 
 def initializeDummyDatabase(): # Crate dummy database file with dummy data in tables
@@ -74,7 +74,7 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
                 guestCount=5,
                 phone="2798833",
                 email="email@email.email.email",
-                date=datetime.datetime.now().date(),
+                date=datetime.date.today(),
                 time=datetime.datetime.now().time(),
                 status="PENDING"),
             Bookings(
@@ -145,9 +145,35 @@ def booking(id):
     '''
     return render_template("booking.html", id=id) #I don't know if all of this will be needed but whatever.
 
-@app.route("/dashboard/<int:id>", methods=["GET"]) #NEEDS: HTML pass, code
+@app.route("/dashboard/<int:id>", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
 def dashboard(id):
-    return render_template("dashboard.html", id=id)
+    '''
+    Route to dashboard
+    Dashboard is supposed to display the restaurants data and act as the hub page for a restaurant manager
+
+    Args:
+    id (int): The ID of the restaurant that is being managed
+
+    Returns:
+    render_template: template for the dashboard with all of the data for it.
+    '''
+
+    return render_template("dashboard.html")
+
+@app.route("/dummyData")
+def dummyData():
+    '''
+    Just refreshing my knowledge on how to send data to an HTML page in flask
+
+    Args:
+    None
+
+    Returns:
+    render_template: the dummy template with the data
+    '''
+    tables = Tables.query.all()
+    bookings = Bookings.query.all()
+    return render_template("dummyDataDisplay.html", tables=tables, bookings=bookings)
 
 if __name__ == "__main__":
     initializeDummyDatabase()
