@@ -6,9 +6,9 @@
 </head>
 
 <body>
-
-  
-    <label for="name">First Name</label>
+<form id="Booking Form" method="POST" action="{{url_for('BookingForm')}}">
+    
+  <label for="name">First Name</label>
     <input type="text" name="name" placeholder="John Doe" pattern=[A-Z\sa-z]{3,20} required>
     <br>
  
