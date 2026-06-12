@@ -1,30 +1,46 @@
 <!doctype html> 
+<html>
 
+<head>
 
-  <div class="elem-group">
-    <label for="name">First Name</label>
-    <input type="text" id="name" name="visitor_name" placeholder="John Doe" pattern=[A-Z\sa-z]{3,20} required>
-  </div>
-  <div class="elem-group">
+</head>
+
+<body>
+<form id="bookingForm" method="POST" action="{{ url_for('submitBooking') }}">
+    
+  <label for="name">First Name</label>
+    <input type="text" name="name" placeholder="John Doe" pattern=[A-Z\sa-z]{3,20} required>
+    <br>
+ 
+  
     <label for="email">Email Address</label>
-    <input type="email" id="email" name="visitor_email" placeholder="john.doe@email.com" required>
-  </div>
-  <div class="elem-group">
+    <input type="email" name="email" placeholder="john.doe@email.com" required>
+    <br>
+  
     <label for="phone">Phone Number</label>
-    <input type="tel" id="phone" name="visitor_phone" placeholder="498-348-3872" pattern=(\d{3})-?\s?(\d{3})-?\s?(\d{4}) required>
-  </div>
-
-  <div class="elem-group">
-    <label for="Group Size">Group Size</label>
-    <input type="tel" id="groupsize" name="Group_size" placeholder="5" pattern=(\d{3})-?\s?(\d{3})-?\s?(\d{4}) required>
-  </div>
+    <input type="tel" name="phone" placeholder="498-348-3872" pattern=(\d{3})-?\s?(\d{3})-?\s?(\d{4}) required>
+    
+    <br>
+    <label for="guestCount">Group Size</label>
+    <select name="guestCount" required>
+        <option value="">Please Select the size of your group</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+      
+    </select>
 
   <hr>
  
-  </div>
-  <div class="elem-group">
-    <label for="Reservation Time">Reservation Time</label>
-    <select id="Reservation-Time" name="Reservation_Time" required>
+  
+ 
+    <label for="time">Reservation Time</label>
+    <select name="time" required>
         <option value="">Please Select a reservation time</option>
         <option value="6:00PM">6:00PM</option>
         <option value="6:30PM">6:30PM</option>
@@ -38,8 +54,13 @@
         <option value="10:30PM">10:30PM</option>
         <option value="11:00PM">11:00PM</option>
     </select>
-  </div>
+
   <hr>
  
   <button type="submit">Confirm Reservation</button>
+
+ 
 </form>
+
+</body> 
+</html>
