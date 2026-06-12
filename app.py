@@ -14,7 +14,7 @@ database = SQLAlchemy(app)
 #-------------------------------------------------------------------------------------------------------
 # Database tables stuff
 #
-# Don't know if this could be used to create different tables for different restaurants. I'll figure it out
+# Don't know how this could be used to create different tables for different restaurants. I'll figure it out
 #-------------------------------------------------------------------------------------------------------
 class Table(database.Model): 
     __tablename__ = "tables"
@@ -41,6 +41,11 @@ class Booking(database.Model):
 
     def __repr__(self): # I don't know how to set up the __repr__
         return f"{self.id}: {self.name}"
+    
+class TimeSlot(database.Model):
+    __tablename__ = "timeSlots"
+
+    slot = database.Column(database.Time, primary_key=True)
 
 def initializeDummyDatabase(): # Crate dummy database file with dummy data in tables
     '''
@@ -102,6 +107,18 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
                 time=datetime.datetime.now().time(),
                 status="CANCELED")
         ]
+
+        dummyTimeSlots = [
+            TimeSlot(slot = datetime.time(10,30)),
+            TimeSlot(slot = datetime.time(11,)),
+            TimeSlot(slot = datetime.time(11,30)),
+            TimeSlot(slot = datetime.time(12)),
+            TimeSlot(slot = datetime.time(12,30)),
+            TimeSlot(slot = datetime.time(13)),
+            TimeSlot(slot = datetime.time(13,30)),
+            TimeSlot(slot = datetime.time(14)),
+            TimeSlot(slot = datetime.time(14,30))
+        ]
     
         print("INSERTING DUMMY TABLES")
         for table in dummyTables:
@@ -109,6 +126,9 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
         print("INSERTING DUMMY BOOKINGS")
         for booking in dummyBookings:
             database.session.add(booking)
+        print("INSERTING TIME SLOTS")
+        for timeSlot in dummyTimeSlots:
+            database.session.add(timeSlot)
 
         print("COMMITING TABLE CHANGES")
         database.session.commit()
@@ -129,7 +149,8 @@ def index():
     Returns:
     render_template: template for the home page
     '''
-    return render_template('index.html')
+    #return render_template('index.html')
+    return redirect(url_for("dashboard"))
 
 @app.route("/booking/<int:id>", methods=["GET", "POST"]) #NEEDS: HTML page, Code
 def booking(id):
@@ -143,10 +164,17 @@ def booking(id):
     Returns:
     render_template: template for the booking form
     '''
+    if request.method == "POST":
+        try:
+            firstName = request.form.get("visitor_name")
+
+            print(f"\tName recieved: {firstName}")
+        except Exception as e:
+            print(f"ERROR! {str(e)}")
     return render_template("booking.html", id=id) #I don't know if the id will be needed but whatever.
 
-@app.route("/dashboard/<int:id>", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
-def dashboard(id):
+@app.route("/dashboard/", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
+def dashboard():
     '''
     Route to dashboard
     Dashboard is supposed to display the restaurants data and act as the hub page for a restaurant manager
@@ -158,7 +186,7 @@ def dashboard(id):
     render_template: template for the dashboard with all of the data for it.
     '''
 
-    return render_template("dashboard.html")
+    return render_template("dashboardIndex.html")
 
 @app.route("/dummyData", methods=["GET"])
 def dummyData():
@@ -173,10 +201,13 @@ def dummyData():
     '''
     tables = Table.query.all()
     bookings = Booking.query.all()
+    timeSlots = TimeSlot.query.all()
     return render_template("dummyDataDisplay.html", 
                            tables=tables, 
-                           bookings=bookings
+                           bookings=bookings,
+                           timeSlots=timeSlots
                            )
+
 
 @app.route("/updateDummyTables", methods=["POST"]) # NEEDS Data validation pass
 def dummyTablesUpdate():

@@ -83,7 +83,28 @@
             <p>No booking data available.</p>
             {% endif %}
         </div>
+        <hr>
 
-        
+        <h2>Time Slots</h2>
+
+        <div class="timeSlots" style="display: flex;">
+            {% if timeSlots %}
+            <table>
+                <thead>
+                    <th>Time Slot</th>
+                </thead>
+
+                <tbody>
+                    {% for timeSlot in timeSlots %}
+                    <tr>
+                        <td>{{ timeSlot.slot.strftime("%I:%M %p") }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No time slot data available.</p>
+            {% endif %}
+        </div>
     </body>
 </html>
