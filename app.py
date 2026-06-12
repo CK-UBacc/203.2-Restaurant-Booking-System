@@ -152,8 +152,8 @@ def index():
     #return render_template('index.html')
     return redirect(url_for("dashboard"))
 
-@app.route("/booking/<int:id>", methods=["GET", "POST"]) #NEEDS: HTML page, Code
-def booking(id):
+@app.route("/booking", methods=["GET", "POST"]) #NEEDS: HTML page, Code
+def booking():
     '''
     Route to booking form.
     Booking form is ment to be an embed on a page of another website so there will be no route to the booking form from our web page.
@@ -171,7 +171,8 @@ def booking(id):
             print(f"\tName recieved: {firstName}")
         except Exception as e:
             print(f"ERROR! {str(e)}")
-    return render_template("booking.html", id=id) #I don't know if the id will be needed but whatever.
+    return render_template("booking.html") #I don't know if the id will be needed but whatever.
+
 
 @app.route("/dashboard/", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
 def dashboard():
