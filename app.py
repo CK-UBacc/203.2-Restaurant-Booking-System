@@ -145,8 +145,8 @@ def booking(id):
     '''
     return render_template("booking.html", id=id) #I don't know if all of this will be needed but whatever.
 
-@app.route("/dashboard/<int:id>", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
-def dashboard(id):
+@app.route("/dashboard", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
+def dashboard():
     '''
     Route to dashboard
     Dashboard is supposed to display the restaurants data and act as the hub page for a restaurant manager
@@ -158,7 +158,7 @@ def dashboard(id):
     render_template: template for the dashboard with all of the data for it.
     '''
 
-    return render_template("dashboard.html")
+    return render_template("dashboardIndex.html")
 
 @app.route("/dummyData")
 def dummyData():
