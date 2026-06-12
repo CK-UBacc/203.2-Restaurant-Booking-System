@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %} · TableFlow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="dash-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="dash-sidebar">
+        <div class="dash-logo">
+            <span>TableFlow</span>
+        </div>
+
+        <nav class="dash-nav">
+            <a href="{{ url_for('dashboard', id=id) }}" class="dash-nav-link {{ 'active' if active == 'overview' else '' }}">Overview</a>
+            <a href="{{ url_for('manage_bookings', id=id) }}" class="dash-nav-link {{ 'active' if active == 'bookings' else '' }}">Manage Bookings</a>
+            <a href="{{ url_for('manage_tables', id=id) }}" class="dash-nav-link {{ 'active' if active == 'tables' else '' }}">Manage Tables</a>
+        </nav>
+
+        <div class="dash-sidebar-footer">
+            <a href="{{ url_for('index') }}" class="dash-logout">Back to site</a>
+        </div>
+    </aside>
+
+    <!-- MAIN DASHBOARD -->
+    <div class="dash-main">
+        <header class="dash-topbar">
+            <div>
+                <h1>{% block heading %}Dashboard{% endblock %}</h1>
+                <p class="dash-subtitle">{% block subtitle %}{% endblock %}</p>
+            </div>
+            <div class="dash-user">
+                <div class="dash-avatar">A</div>
+                <div>
+                    <strong>Admin</strong>
+                    <small>Restaurant #{{ id }}</small>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-stack">
+                {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+</div>
+</body>
+</html>
