@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 import os
 import datetime
@@ -14,9 +14,9 @@ database = SQLAlchemy(app)
 #-------------------------------------------------------------------------------------------------------
 # Database tables stuff
 #
-# Don't know if this could be used to create different tables for different restaurants. I'll figure it out
+# Don't know how this could be used to create different tables for different restaurants. I'll figure it out
 #-------------------------------------------------------------------------------------------------------
-class Tables(database.Model): 
+class Table(database.Model): 
     __tablename__ = "tables"
 
     id = database.Column(database.Integer, primary_key=True)
@@ -26,7 +26,7 @@ class Tables(database.Model):
         return f"{self.id}: {self.seats}"
 
 
-class Bookings(database.Model):
+class Booking(database.Model):
     __tablename__ = "bookings"
 
     id = database.Column(database.Integer, primary_key=True)
@@ -41,6 +41,11 @@ class Bookings(database.Model):
 
     def __repr__(self): # I don't know how to set up the __repr__
         return f"{self.id}: {self.name}"
+    
+class TimeSlot(database.Model):
+    __tablename__ = "timeSlots"
+
+    slot = database.Column(database.Time, primary_key=True)
 
 def initializeDummyDatabase(): # Crate dummy database file with dummy data in tables
     '''
@@ -59,17 +64,17 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
         database.create_all()
 
         dummyTables = [
-            Tables(seats=2),
-            Tables(seats=4),
-            Tables(seats=5),
-            Tables(seats=4),
-            Tables(seats=8),
-            Tables(seats=4),
-            Tables(seats=2)
+            Table(seats=2),
+            Table(seats=4),
+            Table(seats=5),
+            Table(seats=4),
+            Table(seats=8),
+            Table(seats=4),
+            Table(seats=2)
         ]
 
         dummyBookings = [
-            Bookings(
+            Booking(
                 name="Jimmy Johnson",
                 guestCount=5,
                 phone="2798833",
@@ -77,30 +82,42 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
                 date=datetime.date.today(),
                 time=datetime.datetime.now().time(),
                 status="PENDING"),
-            Bookings(
+            Booking(
                 name="Jamie Jackson",
                 guestCount=3,
                 phone="0404040",
                 email="dummy@email.email.email",
-                date=datetime.datetime.now().date(),
+                date=datetime.date.today(),
                 time=datetime.datetime.now().time(),
                 status="EXPIRED"),
-            Bookings(
+            Booking(
                 name="Jackie Chan",
                 guestCount=2,
                 phone="8456215",
                 email="Thebest@email.email.email",
-                date=datetime.datetime.now().date(),
+                date=datetime.date.today(),
                 time=datetime.datetime.now().time(),
                 status="APPROVED"),
-            Bookings(
+            Booking(
                 name="Your mum",
                 guestCount=5,
                 phone="4567892",
                 email="fatass@email.email.email",
-                date=datetime.datetime.now().date(),
+                date=datetime.date.today(),
                 time=datetime.datetime.now().time(),
                 status="CANCELED")
+        ]
+
+        dummyTimeSlots = [
+            TimeSlot(slot = datetime.time(10,30)),
+            TimeSlot(slot = datetime.time(11,)),
+            TimeSlot(slot = datetime.time(11,30)),
+            TimeSlot(slot = datetime.time(12)),
+            TimeSlot(slot = datetime.time(12,30)),
+            TimeSlot(slot = datetime.time(13)),
+            TimeSlot(slot = datetime.time(13,30)),
+            TimeSlot(slot = datetime.time(14)),
+            TimeSlot(slot = datetime.time(14,30))
         ]
     
         print("INSERTING DUMMY TABLES")
@@ -109,6 +126,9 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
         print("INSERTING DUMMY BOOKINGS")
         for booking in dummyBookings:
             database.session.add(booking)
+        print("INSERTING TIME SLOTS")
+        for timeSlot in dummyTimeSlots:
+            database.session.add(timeSlot)
 
         print("COMMITING TABLE CHANGES")
         database.session.commit()
@@ -129,7 +149,8 @@ def index():
     Returns:
     render_template: template for the home page
     '''
-    return render_template('index.html')
+    #return render_template('index.html')
+    return redirect(url_for("dashboard"))
 
 @app.route("/booking/<int:id>", methods=["GET", "POST"]) #NEEDS: HTML page, Code
 def booking(id):
@@ -143,9 +164,16 @@ def booking(id):
     Returns:
     render_template: template for the booking form
     '''
-    return render_template("booking.html", id=id) #I don't know if all of this will be needed but whatever.
+    if request.method == "POST":
+        try:
+            firstName = request.form.get("visitor_name")
 
-@app.route("/dashboard", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
+            print(f"\tName recieved: {firstName}")
+        except Exception as e:
+            print(f"ERROR! {str(e)}")
+    return render_template("booking.html", id=id) #I don't know if the id will be needed but whatever.
+
+@app.route("/dashboard/", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
 def dashboard():
     '''
     Route to dashboard
@@ -160,7 +188,7 @@ def dashboard():
 
     return render_template("dashboardIndex.html")
 
-@app.route("/dummyData")
+@app.route("/dummyData", methods=["GET"])
 def dummyData():
     '''
     Just refreshing my knowledge on how to send data to an HTML page in flask
@@ -171,10 +199,69 @@ def dummyData():
     Returns:
     render_template: the dummy template with the data
     '''
-    tables = Tables.query.all()
-    bookings = Bookings.query.all()
-    return render_template("dummyDataDisplay.html", tables=tables, bookings=bookings)
+    tables = Table.query.all()
+    bookings = Booking.query.all()
+    timeSlots = TimeSlot.query.all()
+    return render_template("dummyDataDisplay.html", 
+                           tables=tables, 
+                           bookings=bookings,
+                           timeSlots=timeSlots
+                           )
 
+
+@app.route("/updateDummyTables", methods=["POST"]) # NEEDS Data validation pass
+def dummyTablesUpdate():
+    '''
+    Adds or edits a table based on input from page
+
+    Args:
+    None
+
+    Returns:
+    redirect: Redirects to dummy data page
+    '''
+    if request.method == "POST":
+        try:
+            table = int(request.form.get("selectedTable"))
+            seats = int(request.form.get("seatsInput"))
+            print(f"\tGot table no: {table}\n\tSeats: {seats}")
+
+            
+            if table == -1:
+                newTable = Table(seats = seats)
+                database.session.add(newTable)
+            else:
+                table = Table.query.get_or_404(table)
+                table.seats = seats
+
+            database.session.commit()
+        except Exception as e:
+            print(f"ERROR! {str(e)}")
+
+    return redirect(url_for("dummyData"))
+
+#-------------------------------------------------------------------------------------------------------
+# Error Handling
+#-------------------------------------------------------------------------------------------------------
+@app.errorhandler(404) # HTML page needs to be done
+def notFound(error):
+    return render_template("error.html", code=404, message="Page not found."), 404
+
+@app.errorhandler(500) # HTML page needs to be done
+def internalError(error):
+    database.session.rollback()
+    return render_template("error.html", code=500, message="Internal server error"), 500
+
+# For some reason the web page was trying to automaticaly get an icon that didn't exist. 
+# Didn't cause any crashes or problems but it was cluttering up the terminal so this stops that.
+# Remove this when we get an icon
+@app.route("/favicon.ico") 
+def favicon():
+    return "", 204
+
+#-------------------------------------------------------------------------------------------------------
+# Main
+#-------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     initializeDummyDatabase()
 
