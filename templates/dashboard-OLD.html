@@ -13,7 +13,7 @@
     <!--SIDEBAR-->
 
     
-    <aside class="dash-sidebar">
+    <nav>
         <div class="dash-logo">
             <span>TableFlow</span>
         </div>
@@ -41,15 +41,13 @@
             <a href="{{ url_for('index') }}" class="dash-logout"> Back to site</a>
             <a href="{{ url_for('logout') }}" class="dash-logout"> Log out</a>
         </div>
-    </aside>
+    </nav>
 
 
     <!--MAIN DASHBOARD-->>
 
 
-    <div class="dash-main">
-
-        <header class="dash-topbar">
+    <header class="dash-topbar">
             <div>
                 {% if role == 'admin' %}
                 <h1>Admin Dashboard</h1>
@@ -67,8 +65,8 @@
                     <small>{{ 'Administrator' if role == 'admin' else 'Customer' }}</small>
                 </div>
             </div>
-        </header>
-
+    </header>
+    <main>
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         <div class="flash-stack flash-stack-inline">
@@ -234,3 +232,7 @@
         </div>
 
         {% else %}
+
+    </main>
+</body>
+</html>

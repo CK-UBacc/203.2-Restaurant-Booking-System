@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width", initial-scale="1.0">
+        <title>{% block title %}Default page title{% endblock %}</title>
+        <link rel="stylesheet" href="/static/style.css">
+    </head>
+
+    <body>
+        <h2>Tables</h2>
+        {% if tables %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Seats</th>
+                </tr>
+            </thead>
+        
+            <tbody>
+                {% for table in tables %}
+                <tr>
+                    <td>{{ table.id }}</td>
+                    <td>{{ table.seats }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No table data available.</p>
+        {% endif %}
+        
+        <h3>Modify tables</h3>
+        <label for="selectedTable">Select a table to modify: </label>
+        <select name="selectedTable" form="tableInputs">
+            <option value="-1">New table</option>
+            {% for table in tables %}
+            <option value="{{ table.id }}">Table no: {{ table.id }}</option>
+            {% endfor %}
+        </select>
+        
+        <form id="tableInputs"
+                method="POST"
+                action="{{ url_for('dummyTablesUpdate') }}">
+            <label for="seatsInput">Table seats:</label>
+            <input type="text" id="seatsInput" name="seatsInput" placeholder="Input number of seats" required>
+            <input type="submit" value="Do thing">
+        </form>
+
+        <hr>
+        <h2>Bookings</h2>
+        <div class="dummyBookings" style="display: flex;">
+            {% if bookings %}
+            <table>
+                <thead>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Guests</th>
+                    <th>Phone No.</th>
+                    <th>Email</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                </thead>
+        
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.id }}</td>
+                        <td>{{ booking.name }}</td>
+                        <td>{{ booking.guestCount }}</td>
+                        <td>{{ booking.phone }}</td>
+                        <td>{{ booking.email }}</td>
+                        <td>{{ booking.date }}</td>
+                        <td>{{ booking.time }}</td>
+                        <td>{{ booking.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No booking data available.</p>
+            {% endif %}
+        </div>
+        <hr>
+
+        <h2>Time Slots</h2>
+
+        <div class="timeSlots" style="display: flex;">
+            {% if timeSlots %}
+            <table>
+                <thead>
+                    <th>Time Slot</th>
+                </thead>
+
+                <tbody>
+                    {% for timeSlot in timeSlots %}
+                    <tr>
+                        <td>{{ timeSlot.slot.strftime("%I:%M %p") }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No time slot data available.</p>
+            {% endif %}
+        </div>
+    </body>
+</html>
