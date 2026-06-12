@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, flash, request
+from flask import Flask, render_template, redirect
 from flask_sqlalchemy import SQLAlchemy
 import os
 import datetime
@@ -145,8 +145,8 @@ def booking(id):
     '''
     return render_template("booking.html", id=id) #I don't know if all of this will be needed but whatever.
 
-@app.route("/dashboard/<int:id>", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
-def dashboard(id):
+@app.route("/dashboard", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
+def dashboard():
     '''
     Route to dashboard
     Dashboard is supposed to display the restaurants data and act as the hub page for a restaurant manager
@@ -157,111 +157,8 @@ def dashboard(id):
     Returns:
     render_template: template for the dashboard with all of the data for it.
     '''
-    return render_template("dashboardBase.html", id=id, active="overview")
 
-@app.route("/dashboard/<int:id>/bookings", methods=["GET"])
-def manage_bookings(id):
-    '''
-    Route to the manage bookings page where an admin can view all bookings
-    and confirm or cancel them.
-
-    Args:
-    id (int): The ID of the restaurant that is being managed
-
-    Returns:
-    render_template: template for the manage bookings page
-    '''
-    bookings = Bookings.query.order_by(Bookings.date.desc(), Bookings.time.desc()).all()
-    return render_template("manageBookings.html", id=id, active="bookings", bookings=bookings)
-
-@app.route("/dashboard/<int:id>/bookings/<int:booking_id>/confirm", methods=["POST"])
-def confirm_booking(id, booking_id):
-    '''
-    Marks a booking as approved.
-
-    Args:
-    id (int): The ID of the restaurant that is being managed
-    booking_id (int): The ID of the booking to confirm
-
-    Returns:
-    redirect: back to the manage bookings page
-    '''
-    booking = Bookings.query.get_or_404(booking_id)
-    booking.status = "APPROVED"
-    database.session.commit()
-    flash("Booking confirmed.", "success")
-    return redirect(url_for("manage_bookings", id=id))
-
-@app.route("/dashboard/<int:id>/bookings/<int:booking_id>/cancel", methods=["POST"])
-def cancel_booking(id, booking_id):
-    '''
-    Marks a booking as canceled.
-
-    Args:
-    id (int): The ID of the restaurant that is being managed
-    booking_id (int): The ID of the booking to cancel
-
-    Returns:
-    redirect: back to the manage bookings page
-    '''
-    booking = Bookings.query.get_or_404(booking_id)
-    booking.status = "CANCELED"
-    database.session.commit()
-    flash("Booking canceled.", "success")
-    return redirect(url_for("manage_bookings", id=id))
-
-@app.route("/dashboard/<int:id>/tables", methods=["GET"])
-def manage_tables(id):
-    '''
-    Route to the manage tables page where an admin can view, add and
-    remove tables.
-
-    Args:
-    id (int): The ID of the restaurant that is being managed
-
-    Returns:
-    render_template: template for the manage tables page
-    '''
-    tables = Tables.query.order_by(Tables.id).all()
-    return render_template("manageTables.html", id=id, active="tables", tables=tables)
-
-@app.route("/dashboard/<int:id>/tables/add", methods=["POST"])
-def add_table(id):
-    '''
-    Adds a new table with the submitted seat count.
-
-    Args:
-    id (int): The ID of the restaurant that is being managed
-
-    Returns:
-    redirect: back to the manage tables page
-    '''
-    seats = request.form.get("seats", type=int)
-    if seats and seats > 0:
-        database.session.add(Tables(seats=seats))
-        database.session.commit()
-        flash("Table added.", "success")
-    else:
-        flash("Please enter a valid number of seats.", "error")
-    return redirect(url_for("manage_tables", id=id))
-
-@app.route("/dashboard/<int:id>/tables/<int:table_id>/delete", methods=["POST"])
-def delete_table(id, table_id):
-    '''
-    Removes a table.
-
-    Args:
-    id (int): The ID of the restaurant that is being managed
-    table_id (int): The ID of the table to delete
-
-    Returns:
-    redirect: back to the manage tables page
-    '''
-    table = Tables.query.get_or_404(table_id)
-    database.session.delete(table)
-    database.session.commit()
-    flash("Table removed.", "success")
-    return redirect(url_for("manage_tables", id=id))
+    return render_template("dashboardIndex.html")
 
 @app.route("/dummyData")
 def dummyData():
