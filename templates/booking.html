@@ -43,7 +43,8 @@
     <label for="time">Reservation Time</label>
     <select name="time" required>
         <option value="">Please Select a reservation time</option>
-        <option value="6:00PM">6:00PM</option>
+        <!-- Old dummy timeslot options -->
+        <!--<option value="6:00PM">6:00PM</option>
         <option value="6:30PM">6:30PM</option>
         <option value="7:00PM">7:00PM</option>
         <option value="7:30PM">7:30PM</option>
@@ -53,7 +54,15 @@
         <option value="9:30PM">9:30PM</option>
         <option value="10:00PM">10:00PM</option>
         <option value="10:30PM">10:30PM</option>
-        <option value="11:00PM">11:00PM</option>
+        <option value="11:00PM">11:00PM</option>-->
+
+        {% if timeSlots %}
+        {% for timeSlot in timeSlots %}
+          <option value="{{ timeSlot.slot }}">{{ timeSlot.slot.strftime("%I:%M %p") }}</option>
+        {% endfor %}
+        {% else %}
+
+        {% endif %}
     </select>
 
   <hr>

@@ -162,8 +162,10 @@ def booking():
     id (int): restaurant ID
 
     Returns:
-    render_template: template for the booking form
+    render_template: template for the booking form with data for the page
     '''
+    #if request.method == "GET": # Is it even neccesary to do the get query?
+
     if request.method == "POST":
         try:
             name = request.form.get("name")
@@ -175,15 +177,32 @@ def booking():
             guestCount = int(request.form.get("guestCount"))
             print(f"\tReservation size recieved: {guestCount}")
 
-            date = datetime.datetime(request.form.get("date"))
+            date = datetime.date.fromisoformat(request.form.get("date"))
             print(f"\tDate recieved: {date}")
-            time = request.form.get("time")
+            time = datetime.time.strptime(request.form.get("time"), "%H:%M:%S")
             print(f"\tTime recieved: {time}")
 
+            newBooking = Booking(
+                name=name,
+                guestCount=guestCount,
+                email=email,
+                phone=phone,
+                date=date,
+                time=time,
+                status="Pending")
+
+            with app.app_context():
+                database.session.add(newBooking)
+                database.session.commit()
 
         except Exception as e:
             print(f"ERROR! {str(e)}")
-    return render_template("booking.html") #I don't know if the id will be needed but whatever.
+    
+    # Getting all the data to display on the page
+    timeSlots = TimeSlot.query.all()
+
+
+    return render_template("booking.html", timeSlots=timeSlots) #I don't know if the id will be needed but whatever.
 
 
 @app.route("/dashboard", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
