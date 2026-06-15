@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
-import os
+# import os # not currently being used? 
 import datetime
 
 app = Flask(__name__)
@@ -42,7 +42,7 @@ class Booking(database.Model):
     def __repr__(self): # I don't know how to set up the __repr__
         return f"{self.id}: {self.name}"
     
-class TimeSlot(database.Model):
+class TimeSlot(database.Model): # 
     __tablename__ = "timeSlots"
 
     slot = database.Column(database.Time, primary_key=True)
@@ -152,8 +152,8 @@ def index():
     #return render_template('index.html')
     return redirect(url_for("dashboard"))
 
-@app.route("/booking/<int:id>", methods=["GET", "POST"]) #NEEDS: HTML page, Code
-def booking(id):
+@app.route("/booking", methods=["GET", "POST"]) #NEEDS: HTML page, Code
+def booking():
     '''
     Route to booking form.
     Booking form is ment to be an embed on a page of another website so there will be no route to the booking form from our web page.
@@ -162,18 +162,50 @@ def booking(id):
     id (int): restaurant ID
 
     Returns:
-    render_template: template for the booking form
+    render_template: template for the booking form with data for the page
     '''
+    #if request.method == "GET": # Is it even neccesary to do the get query?
+
     if request.method == "POST":
         try:
-            firstName = request.form.get("visitor_name")
+            name = request.form.get("name")
+            print(f"\tName recieved: {name}")
+            email = request.form.get("email")
+            print(f"\tEmail recieved: {email}")
+            phone = request.form.get("phone")
+            print(f"\tPhone No. recieved: {phone}")
+            guestCount = int(request.form.get("guestCount"))
+            print(f"\tReservation size recieved: {guestCount}")
 
-            print(f"\tName recieved: {firstName}")
+            date = datetime.date.fromisoformat(request.form.get("date"))
+            print(f"\tDate recieved: {date}")
+            time = datetime.time.strptime(request.form.get("time"), "%H:%M:%S")
+            print(f"\tTime recieved: {time}")
+
+            newBooking = Booking(
+                name=name,
+                guestCount=guestCount,
+                email=email,
+                phone=phone,
+                date=date,
+                time=time,
+                status="Pending")
+
+            with app.app_context():
+                database.session.add(newBooking)
+                database.session.commit()
+
         except Exception as e:
             print(f"ERROR! {str(e)}")
-    return render_template("booking.html", id=id) #I don't know if the id will be needed but whatever.
+    
+    # Getting all the data to display on the page
+    timeSlots = TimeSlot.query.all()
 
-@app.route("/dashboard/", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
+
+    return render_template("booking.html", timeSlots=timeSlots) #I don't know if the id will be needed but whatever.
+
+
+@app.route("/dashboard", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
 def dashboard():
     '''
     Route to dashboard
@@ -186,7 +218,37 @@ def dashboard():
     render_template: template for the dashboard with all of the data for it.
     '''
 
-    return render_template("dashboardIndex.html")
+    bookings = Booking.query.all()
+    tables = Table.query.all()
+    return render_template("dashboardOverview.html", bookings=bookings, tables=tables, active="overview")
+
+@app.route("/dashboard/bookings", methods=["GET"])
+def dashboardBookings():
+    '''
+    Route to the manage bookings page of the dashboard.
+
+    Args:
+    None
+
+    Returns:
+    render_template: template for the manage bookings page with all bookings.
+    '''
+    bookings = Booking.query.all()
+    return render_template("dashboardBookings.html", bookings=bookings, active="bookings")
+
+@app.route("/dashboard/tables", methods=["GET"])
+def dashboardTables():
+    '''
+    Route to the manage tables page of the dashboard.
+
+    Args:
+    None
+
+    Returns:
+    render_template: template for the manage tables page with all tables.
+    '''
+    tables = Table.query.all()
+    return render_template("dashboardTables.html", tables=tables, active="tables")
 
 @app.route("/dummyData", methods=["GET"])
 def dummyData():
