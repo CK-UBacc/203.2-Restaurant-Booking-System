@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
-import os
+# import os # not currently being used?
 import datetime
 
 app = Flask(__name__)
@@ -42,7 +42,7 @@ class Booking(database.Model):
     def __repr__(self): # I don't know how to set up the __repr__
         return f"{self.id}: {self.name}"
     
-class TimeSlot(database.Model):
+class TimeSlot(database.Model): # 
     __tablename__ = "timeSlots"
 
     slot = database.Column(database.Time, primary_key=True)
@@ -166,15 +166,27 @@ def booking():
     '''
     if request.method == "POST":
         try:
-            firstName = request.form.get("visitor_name")
+            name = request.form.get("name")
+            print(f"\tName recieved: {name}")
+            email = request.form.get("email")
+            print(f"\tEmail recieved: {email}")
+            phone = request.form.get("phone")
+            print(f"\tPhone No. recieved: {phone}")
+            guestCount = int(request.form.get("guestCount"))
+            print(f"\tReservation size recieved: {guestCount}")
 
-            print(f"\tName recieved: {firstName}")
+            date = datetime.datetime(request.form.get("date"))
+            print(f"\tDate recieved: {date}")
+            time = request.form.get("time")
+            print(f"\tTime recieved: {time}")
+
+
         except Exception as e:
             print(f"ERROR! {str(e)}")
     return render_template("booking.html") #I don't know if the id will be needed but whatever.
 
 
-@app.route("/dashboard/", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
+@app.route("/dashboard", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
 def dashboard():
     '''
     Route to dashboard
@@ -187,7 +199,7 @@ def dashboard():
     render_template: template for the dashboard with all of the data for it.
     '''
 
-    return render_template("dashboardIndex.html")
+    return render_template("dashboard.html")
 
 @app.route("/dummyData", methods=["GET"])
 def dummyData():
