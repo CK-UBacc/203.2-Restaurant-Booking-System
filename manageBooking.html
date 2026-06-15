@@ -1,0 +1,82 @@
+{% extends "dashboardBase.html" %}
+
+{% block title %}Manage Bookings{% endblock %}
+
+{% block heading %}Manage Bookings{% endblock %}
+{% block subtitle %}View, confirm and manage all reservations{% endblock %}
+
+{% block content %}
+
+<section class="dash-stats">
+    <div class="stat-card">
+        <p class="stat-label">Total bookings</p>
+        <p class="stat-value">{{ stats.total }}</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Pending</p>
+        <p class="stat-value">{{ stats.pending }}</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Approved</p>
+        <p class="stat-value">{{ stats.approved }}</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">Canceled / Expired</p>
+        <p class="stat-value">{{ stats.canceled }}</p>
+    </div>
+</section>
+
+<section class="dash-card dash-card-wide">
+    <div class="dash-card-header">
+        <h2>All Bookings</h2>
+    </div>
+    <div class="table-responsive">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Guests</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.name }}</td>
+                    <td>{{ booking.guestCount }}</td>
+                    <td>{{ booking.phone }}</td>
+                    <td>{{ booking.email }}</td>
+                    <td>{{ booking.date.strftime("%d %b %Y") }}</td>
+                    <td>{{ booking.time.strftime("%I:%M %p") }}</td>
+                    <td>
+                        <span class="badge badge-{{ booking.status | lower }}">{{ booking.status | capitalize }}</span>
+                    </td>
+                    <td class="dash-actions">
+                        {% if booking.status == "PENDING" %}
+                        <form method="post" action="{{ url_for('confirmBooking', id=booking.id) }}">
+                            <button type="submit" class="btn btn-confirm" title="Confirm">✔</button>
+                        </form>
+                        <form method="post" action="{{ url_for('cancelBooking', id=booking.id) }}">
+                            <button type="submit" class="btn btn-cancel" title="Cancel">✘</button>
+                        </form>
+                        {% else %}
+                        <span class="dash-empty">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" class="dash-empty">No bookings yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}
