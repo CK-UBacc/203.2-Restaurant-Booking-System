@@ -1,0 +1,62 @@
+{% extends "dashboardBase.html" %}
+
+{% block title %}Manage Bookings{% endblock %}
+
+{% block heading %}Manage Bookings{% endblock %}
+{% block subtitle %}View and manage all restaurant bookings{% endblock %}
+
+{% block content %}
+
+<section class="dash-card dash-card-wide">
+    <div class="dash-card-header">
+        <h2>All Bookings</h2>
+    </div>
+    <div class="table-responsive">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Date & time</th>
+                    <th>Guests</th>
+                    <th>Status</th>
+                    <th>Edit Booking</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.id }}</td>
+                    <td>{{ booking.name }}</td>
+                    <td>{{ booking.phone }}</td>
+                    <td>{{ booking.email }}</td>
+                    <td>{{ booking.date }} · {{ booking.time }}</td>
+                    <td>{{ booking.guestCount }}</td>
+                    <td><span class="badge badge-{{ booking.status | lower }}">{{ booking.status }}</span></td>
+                    <td>
+                        <button type="button" class="edit-button">
+                        Edit Booking Status
+                        </button>
+                    </td>
+                </tr>
+
+                
+               
+               
+
+            
+        
+                {% else %}
+                <tr>
+                    <td colspan="8" class="dash-empty">No bookings yet.</td>
+                </tr>
+                {% endfor %}
+               
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}

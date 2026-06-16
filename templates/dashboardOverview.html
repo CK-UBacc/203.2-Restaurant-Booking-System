@@ -1,0 +1,91 @@
+{% extends "dashboardBase.html" %}
+
+{% block title %}Overview{% endblock %}
+
+{% block heading %}Dashboard{% endblock %}
+{% block subtitle %}Monitor and manage the restaurant's booking activity{% endblock %}
+
+{% block content %}
+
+<section class="dash-stats">
+    <div class="stat-card">
+        <div>
+            <p class="stat-label">Total bookings</p>
+            <p class="stat-value">{{ bookings | length }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div>
+            <p class="stat-label">Approved</p>
+            <p class="stat-value">{{ bookings | selectattr('status', 'equalto', 'APPROVED') | list | length }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div>
+            <p class="stat-label">Pending</p>
+            <p class="stat-value">{{ bookings | selectattr('status', 'equalto', 'PENDING') | list | length }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div>
+            <p class="stat-label">Tables</p>
+            <p class="stat-value">{{ tables | length }}</p>
+        </div>
+    </div>
+</section>
+
+<div class="dash-grid">
+    <section class="dash-card dash-card-wide">
+        <div class="dash-card-header">
+            <h2>Recent Bookings</h2>
+            <a href="{{ url_for('dashboardBookings') }}" class="dash-link">View all →</a>
+        </div>
+        <div class="table-responsive">
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>Date & time</th>
+                        <th>Guests</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.name }}</td>
+                        <td>{{ booking.phone }}</td>
+                        <td>{{ booking.date }} · {{ booking.time }}</td>
+                        <td>{{ booking.guestCount }}</td>
+                        <td><span class="badge badge-{{ booking.status | lower }}">{{ booking.status }}</span></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="dash-empty">No bookings yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="dash-card">
+        <div class="dash-card-header">
+            <h2>Table Floor Plan</h2>
+            <a href="{{ url_for('dashboardTables') }}" class="dash-link">Manage tables →</a>
+        </div>
+        <div class="table-grid">
+            {% for table in tables %}
+            <div class="table-cell">
+                <span>Table {{ table.id }}</span>
+                <small>{{ table.seats }} seats</small>
+            </div>
+            {% else %}
+            <p class="dash-empty">No table data yet.</p>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+{% endblock %}
