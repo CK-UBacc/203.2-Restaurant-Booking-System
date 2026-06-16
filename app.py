@@ -229,6 +229,11 @@ def loginpage():
     return render_template("loginpage.html")
 
 
+
+
+
+
+
 @app.route("/dashboard/bookings", methods=["GET"])
 def dashboardBookings():
     '''
