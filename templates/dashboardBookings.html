@@ -22,6 +22,7 @@
                     <th>Date & time</th>
                     <th>Guests</th>
                     <th>Status</th>
+                    <th>Edit Booking</th>
                 </tr>
             </thead>
             <tbody>
@@ -34,12 +35,25 @@
                     <td>{{ booking.date }} · {{ booking.time }}</td>
                     <td>{{ booking.guestCount }}</td>
                     <td><span class="badge badge-{{ booking.status | lower }}">{{ booking.status }}</span></td>
+                    <td>
+                        <button type="button" class="edit-button">
+                        Edit Booking Status
+                        </button>
+                    </td>
                 </tr>
+
+                
+               
+               
+
+            
+        
                 {% else %}
                 <tr>
                     <td colspan="7" class="dash-empty">No bookings yet.</td>
                 </tr>
                 {% endfor %}
+               
             </tbody>
         </table>
     </div>
