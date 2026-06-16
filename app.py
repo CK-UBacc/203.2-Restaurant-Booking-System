@@ -221,18 +221,6 @@ def dashboard():
     tables = Table.query.all()
     return render_template("dashboardOverview.html", bookings=bookings, tables=tables, active="overview")
 
-@app.route("/loginpage", methods=["GET", "POST"])
-def loginpage():
-    if request.method == "POST":
-        pass
-
-    return render_template("loginpage.html")
-
-
-
-
-
-
 
 @app.route("/dashboard/bookings", methods=["GET"])
 def dashboardBookings():
@@ -282,6 +270,11 @@ def dummyData():
                            timeSlots=timeSlots
                            )
 
+@app.route("/loginpage", methods=["GET","POST"])
+def loginpage():
+    if request.method == "POST":
+        pass
+    return render_template("loginpage.html")
 
 @app.route("/updateDummyTables", methods=["POST"]) # NEEDS Data validation pass
 def dummyTablesUpdate():
