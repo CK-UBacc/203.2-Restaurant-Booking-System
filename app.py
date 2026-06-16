@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
-# import os # not currently being used? 
+# import os # not currently being used?
 import datetime
 
 app = Flask(__name__)
@@ -200,7 +200,6 @@ def booking():
     
     # Getting all the data to display on the page
     timeSlots = TimeSlot.query.all()
-
 
     return render_template("booking.html", timeSlots=timeSlots) #I don't know if the id will be needed but whatever.
 
