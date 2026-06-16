@@ -74,7 +74,13 @@
                         <td>{{ booking.email }}</td>
                         <td>{{ booking.date }}</td>
                         <td>{{ booking.time }}</td>
-                        <td>{{ booking.status }}</td>
+                        <td>
+                            <select name="bookingStatus">
+                                <option value="PENDING">PENDING</option>
+                                <option value="APPROVED">APPROVED</option>
+                                <option value="CANCELED">CANCELED</option>
+                            </select>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

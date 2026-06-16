@@ -25,7 +25,6 @@ class Table(database.Model):
     def __repr__(self):
         return f"{self.id}: {self.seats}"
 
-
 class Booking(database.Model):
     __tablename__ = "bookings"
 
@@ -34,9 +33,9 @@ class Booking(database.Model):
     guestCount = database.Column(database.Integer, default=1)
     phone = database.Column(database.String(32))
     email = database.Column(database.String(128))
-    # Table ID and stuff goes here. Problem is that there could be multiple tables booked and also how do I do foreign keys in SQLAlchemy.
     date = database.Column(database.Date, nullable=False)
     time = database.Column(database.Time, nullable=False)
+    table = database.Column(database.Integer, database.ForeignKey(Table.id))
     status = database.Column(database.String(16), nullable=False)
 
     def __repr__(self): # I don't know how to set up the __repr__
@@ -81,6 +80,7 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
                 email="email@email.email.email",
                 date=datetime.date.today(),
                 time=datetime.datetime.now().time(),
+                table=1,
                 status="PENDING"),
             Booking(
                 name="Jamie Jackson",
@@ -89,6 +89,7 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
                 email="dummy@email.email.email",
                 date=datetime.date.today(),
                 time=datetime.datetime.now().time(),
+                table=12,
                 status="EXPIRED"),
             Booking(
                 name="Jackie Chan",
@@ -97,6 +98,7 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
                 email="Thebest@email.email.email",
                 date=datetime.date.today(),
                 time=datetime.datetime.now().time(),
+                table=4,
                 status="APPROVED"),
             Booking(
                 name="Your mum",
@@ -189,7 +191,7 @@ def booking():
                 phone=phone,
                 date=date,
                 time=time,
-                status="Pending")
+                status="PENDING")
 
             with app.app_context():
                 database.session.add(newBooking)
@@ -202,7 +204,6 @@ def booking():
     timeSlots = TimeSlot.query.all()
 
     return render_template("booking.html", timeSlots=timeSlots) #I don't know if the id will be needed but whatever.
-
 
 @app.route("/dashboard", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
 def dashboard():
@@ -268,7 +269,6 @@ def dummyData():
                            bookings=bookings,
                            timeSlots=timeSlots
                            )
-
 
 @app.route("/updateDummyTables", methods=["POST"]) # NEEDS Data validation pass
 def dummyTablesUpdate():
