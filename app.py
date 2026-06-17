@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_sqlalchemy import SQLAlchemy
 # import os # not currently being used?
 import datetime
@@ -221,6 +221,7 @@ def dashboard():
     tables = Table.query.all()
     return render_template("dashboardOverview.html", bookings=bookings, tables=tables, active="overview")
 
+
 @app.route("/dashboard/bookings", methods=["GET"])
 def dashboardBookings():
     '''
@@ -233,7 +234,59 @@ def dashboardBookings():
     render_template: template for the manage bookings page with all bookings.
     '''
     bookings = Booking.query.all()
-    return render_template("dashboardBookings.html", bookings=bookings, active="bookings")
+    timeSlots = TimeSlot.query.all()
+    return render_template("dashboardBookings.html", bookings=bookings, timeSlots=timeSlots, active="bookings")
+
+@app.route("/dashboard/bookings/add", methods=["POST"]) #    Create a new booking record in the database
+
+def dashboardBookingsAdd(): #    New bookings are show "Pending" status by default
+
+
+    try:
+        name = request.form.get("name")
+        email = request.form.get("email")
+        phone = request.form.get("phone")
+        guestCount = int(request.form.get("guestCount"))
+        date = datetime.date.fromisoformat(request.form.get("date"))
+        time = datetime.datetime.strptime(request.form.get("time"), "%H:%M:%S").time()
+
+        newBooking = Booking(
+            name=name,
+            guestCount=guestCount,
+            email=email,
+            phone=phone,
+            date=date,
+            time=time,
+            status="Pending")
+
+        database.session.add(newBooking)
+        database.session.commit()
+        flash("Booking added successfully.", "success")
+    except Exception as e:
+        print(f"ERROR! {str(e)}")
+        flash("Failed to add booking. Please check all fields.", "error")
+
+    return redirect(url_for("dashboardBookings"))
+
+@app.route("/dashboard/bookings/edit/<int:id>", methods=["POST"])  #Updates all fields of an exist booking (name, email, phone, guest count,date, time, and status)
+
+def dashboardBookingsEdit(id):
+
+    try:
+        booking = Booking.query.get_or_404(id)
+        booking.name = request.form.get("name")
+        booking.email = request.form.get("email")
+        booking.phone = request.form.get("phone")
+        booking.guestCount = int(request.form.get("guestCount"))
+        booking.date = datetime.date.fromisoformat(request.form.get("date"))
+        booking.time = datetime.datetime.strptime(request.form.get("time"), "%H:%M:%S").time()
+        booking.status = request.form.get("status")
+        database.session.commit()
+        flash("Booking updated successfully.", "success")
+    except Exception as e:
+        print(f"ERROR! {str(e)}")
+        flash("Failed to update booking.", "error")
+    return redirect(url_for("dashboardBookings"))
 
 @app.route("/dashboard/tables", methods=["GET"])
 def dashboardTables():
@@ -248,6 +301,45 @@ def dashboardTables():
     '''
     tables = Table.query.all()
     return render_template("dashboardTables.html", tables=tables, active="tables")
+
+@app.route("/dashboard/tables/add", methods=["POST"])  # Creates a new table record with the specific seat count
+def dashboardTablesAdd():
+    
+    try:
+        seats = int(request.form.get("seats"))
+        database.session.add(Table(seats=seats))
+        database.session.commit()
+        flash("Table added successfully.", "success")
+    except Exception as e:
+        print(f"ERROR! {str(e)}")
+        flash("Failed to add table.", "error")
+    return redirect(url_for("dashboardTables"))
+
+@app.route("/dashboard/tables/edit/<int:id>", methods=["POST"]) # Updates the seat number in existing table
+def dashboardTablesEdit(id):
+
+    try:
+        table = Table.query.get_or_404(id)
+        table.seats = int(request.form.get("seats"))
+        database.session.commit()
+        flash("Table updated successfully.", "success")
+    except Exception as e:
+        print(f"ERROR! {str(e)}")
+        flash("Failed to update table.", "error")
+    return redirect(url_for("dashboardTables"))
+
+@app.route("/dashboard/tables/delete/<int:id>", methods=["POST"]) # Delete a table
+def dashboardTablesDelete(id):
+
+    try:
+        table = Table.query.get_or_404(id)
+        database.session.delete(table)
+        database.session.commit()
+        flash("Table deleted.", "success")
+    except Exception as e:
+        print(f"ERROR! {str(e)}")
+        flash("Failed to delete table.", "error")
+    return redirect(url_for("dashboardTables"))
 
 @app.route("/dummyData", methods=["GET"])
 def dummyData():
@@ -269,6 +361,22 @@ def dummyData():
                            timeSlots=timeSlots
                            )
 
+# Admin Account for Loginpage
+ADMIN_USERNAME = "admin123" #Username is admin123
+ADMIN_PASSWORD = "admin123" #Password is admin123
+
+@app.route("/loginpage", methods=["GET","POST"])
+def loginpage():
+    
+
+    if request.method == "POST":
+        username = request.form.get("AdminUsername")
+        password = request.form.get("Adminpassword")
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+            session["logged_in"] = True
+            return redirect(url_for("dashboard"))
+        flash("Invalid username or password.", "error")
+    return render_template("loginpage.html")
 
 @app.route("/updateDummyTables", methods=["POST"]) # NEEDS Data validation pass
 def dummyTablesUpdate():

@@ -2,10 +2,12 @@
 <html>
 
 <head>
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 </head>
 
-<body>
+<body class="booking-page">
 <form id="bookingForm" method="POST" action="{{ url_for('booking') }}">
     
   <label for="name">First Name</label>
