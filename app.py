@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 # import os # not currently being used?
 import datetime
+from wtformsTesting import *
 
 app = Flask(__name__)
 
@@ -264,10 +265,14 @@ def dummyData():
     tables = Table.query.all()
     bookings = Booking.query.all()
     timeSlots = TimeSlot.query.all()
+    testBooking = TestBookingForm()
+    testBooking.process()
+
     return render_template("dummyDataDisplay.html", 
                            tables=tables, 
                            bookings=bookings,
-                           timeSlots=timeSlots
+                           timeSlots=timeSlots,
+                           testBooking=testBooking
                            )
 
 @app.route("/updateDummyTables", methods=["POST"]) # NEEDS Data validation pass
