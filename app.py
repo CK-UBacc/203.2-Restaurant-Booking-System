@@ -1,8 +1,12 @@
 from flask import Flask, render_template, redirect, url_for, request
-from flask_sqlalchemy import SQLAlchemy
+#from flask_sqlalchemy import SQLAlchemy # moved to models.py
 # import os # not currently being used?
 import datetime
-from wtformsTesting import *
+
+from modules.models import *
+
+
+#from wtformsTesting import * # Not used
 
 app = Flask(__name__)
 
@@ -10,43 +14,17 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///dummy.db"
 app.config["SLQALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "your-secret-key-for-flash-messages" # I forgot what the secret key is but it is super important
 
-database = SQLAlchemy(app)
+# database = SQLAlchemy(app)
+
+# Connects the database created in models.py to app created here.
+database.init_app(app)
+ 
 
 #-------------------------------------------------------------------------------------------------------
 # Database tables stuff
 #
 # Don't know how this could be used to create different tables for different restaurants. I'll figure it out
 #-------------------------------------------------------------------------------------------------------
-class Table(database.Model): 
-    __tablename__ = "tables"
-
-    id = database.Column(database.Integer, primary_key=True)
-    seats = database.Column(database.Integer)
-
-    def __repr__(self):
-        return f"{self.id}: {self.seats}"
-
-class Booking(database.Model):
-    __tablename__ = "bookings"
-
-    id = database.Column(database.Integer, primary_key=True)
-    name = database.Column(database.String(128), nullable=False)
-    guestCount = database.Column(database.Integer, default=1)
-    phone = database.Column(database.String(32))
-    email = database.Column(database.String(128))
-    date = database.Column(database.Date, nullable=False)
-    time = database.Column(database.Time, nullable=False)
-    table = database.Column(database.Integer, database.ForeignKey(Table.id))
-    status = database.Column(database.String(16), nullable=False)
-
-    def __repr__(self): # I don't know how to set up the __repr__
-        return f"{self.id}: {self.name}"
-    
-class TimeSlot(database.Model): # 
-    __tablename__ = "timeSlots"
-
-    slot = database.Column(database.Time, primary_key=True)
-
 def initializeDummyDatabase(): # Crate dummy database file with dummy data in tables
     '''
     Creates a dummy database for testing
@@ -73,44 +51,6 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
             Table(seats=2)
         ]
 
-        dummyBookings = [
-            Booking(
-                name="Jimmy Johnson",
-                guestCount=5,
-                phone="2798833",
-                email="email@email.email.email",
-                date=datetime.date.today(),
-                time=datetime.datetime.now().time(),
-                table=1,
-                status="PENDING"),
-            Booking(
-                name="Jamie Jackson",
-                guestCount=3,
-                phone="0404040",
-                email="dummy@email.email.email",
-                date=datetime.date.today(),
-                time=datetime.datetime.now().time(),
-                table=12,
-                status="EXPIRED"),
-            Booking(
-                name="Jackie Chan",
-                guestCount=2,
-                phone="8456215",
-                email="Thebest@email.email.email",
-                date=datetime.date.today(),
-                time=datetime.datetime.now().time(),
-                table=4,
-                status="APPROVED"),
-            Booking(
-                name="Your mum",
-                guestCount=5,
-                phone="4567892",
-                email="fatass@email.email.email",
-                date=datetime.date.today(),
-                time=datetime.datetime.now().time(),
-                status="CANCELED")
-        ]
-
         dummyTimeSlots = [
             TimeSlot(slot = datetime.time(10,30)),
             TimeSlot(slot = datetime.time(11,)),
@@ -121,6 +61,44 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
             TimeSlot(slot = datetime.time(13,30)),
             TimeSlot(slot = datetime.time(14)),
             TimeSlot(slot = datetime.time(14,30))
+        ]
+
+        dummyBookings = [
+            Booking(
+                name="Jimmy Johnson",
+                guestCount=5,
+                phone="2798833",
+                email="email@email.email.email",
+                date=datetime.date.today(),
+                time=dummyTimeSlots[1].slot,
+                table=1,
+                status="PENDING"),
+            Booking(
+                name="Jamie Jackson",
+                guestCount=3,
+                phone="0404040",
+                email="dummy@email.email.email",
+                date=datetime.date.today(),
+                time=dummyTimeSlots[3].slot,
+                table=12,
+                status="EXPIRED"),
+            Booking(
+                name="Jackie Chan",
+                guestCount=2,
+                phone="8456215",
+                email="Thebest@email.email.email",
+                date=datetime.date.today(),
+                time=dummyTimeSlots[6].slot,
+                table=4,
+                status="APPROVED"),
+            Booking(
+                name="Your mum",
+                guestCount=5,
+                phone="4567892",
+                email="fatass@email.email.email",
+                date=datetime.date.today(),
+                time=dummyTimeSlots[2].slot,
+                status="CANCELED")
         ]
     
         print("INSERTING DUMMY TABLES")
@@ -265,14 +243,11 @@ def dummyData():
     tables = Table.query.all()
     bookings = Booking.query.all()
     timeSlots = TimeSlot.query.all()
-    testBooking = TestBookingForm()
-    testBooking.process()
 
     return render_template("dummyDataDisplay.html", 
                            tables=tables, 
                            bookings=bookings,
                            timeSlots=timeSlots,
-                           testBooking=testBooking
                            )
 
 @app.route("/updateDummyTables", methods=["POST"]) # NEEDS Data validation pass
