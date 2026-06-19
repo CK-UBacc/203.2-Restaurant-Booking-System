@@ -421,10 +421,33 @@ main {
 .btn-cancel:hover {
     background-color: var(--color-gray-700);
     color: var(--color-white);
+
     border-color: var(--color-gray-700);
 }
 
 
+
+.btn-danger {
+    background-color: #dc2626;
+    color: var(--color-white);
+    border-color: #dc2626;
+}
+
+.btn-danger:hover {
+    background-color: #b91c1c;
+    border-color: #b91c1c;
+}
+
+.modal-box-sm {
+    max-width: 400px;
+    width: 100%;
+}
+
+.confirm-message {
+    color: var(--color-gray-500);
+    font-size: 0.95rem;
+    margin: 0.5rem 0 1.25rem;
+}
 
 /* ---------------------------------------------------------------------
    Table floor grid
@@ -455,6 +478,24 @@ main {
 .table-cell small {
     color: var(--color-gray-500);
     font-size: 0.8rem;
+}
+
+.table-cell-add {
+    background-color: var(--color-white);
+    border: 2px dashed var(--color-gray-300);
+    cursor: pointer;
+    justify-content: center;
+}
+
+.table-cell-add:hover {
+    background-color: var(--color-gray-200);
+}
+
+.add-table-icon {
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--color-gray-400);
+    line-height: 1;
 }
 
 /* ---------------------------------------------------------------------
@@ -585,6 +626,15 @@ main {
     font-size: 0.95rem;
     color: var(--color-black);
     background-color: var(--color-white);
+}
+
+.date-dropdowns {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.date-dropdowns .modal-select {
+    flex: 1;
 }
 
 .modal-actions {

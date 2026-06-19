@@ -33,7 +33,7 @@
                     <td>{{ booking.name }}</td>
                     <td>{{ booking.phone }}</td>
                     <td>{{ booking.email }}</td>
-                    <td>{{ booking.date }} · {{ booking.time }}</td>
+                    <td>{{ booking.date.strftime('%d %b %Y') }} · {{ booking.time.strftime('%I:%M %p') }}</td>
                     <td>{{ booking.guestCount }}</td>
                     <td><span class="badge badge-{{ booking.status | lower }}">{{ booking.status }}</span></td>
                     <td>
@@ -99,7 +99,38 @@
             </select>
 
             <label>Date</label>
-            <input type="date" id="editDate" name="date" required>
+            <input type="hidden" id="editDate" name="date">
+            <div class="date-dropdowns">
+                <select id="editDay" class="modal-select" required>
+                    <option value="">Day</option>
+                    {% for d in range(1, 32) %}
+                    <option value="{{ d }}">{{ d }}</option>
+                    {% endfor %}
+                </select>
+                <select id="editMonth" class="modal-select" required>
+                    <option value="">Month</option>
+                    <option value="01">January</option>
+                    <option value="02">February</option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+                <select id="editYear" class="modal-select" required>
+                    <option value="">Year</option>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                </select>
+            </div>
 
             <label>Time</label>
             <select id="editTime" name="time" class="modal-select" required>
@@ -110,10 +141,10 @@
 
             <label>Status</label>
             <select id="editStatus" name="status" class="modal-select" required>
-                <option value="Pending">Pending</option>
-                <option value="Approved">Approved</option>
-                <option value="Canceled">Canceled</option>
-                <option value="Expired">Expired</option>
+                <option value="PENDING">Pending</option>
+                <option value="APPROVED">Approved</option>
+                <option value="CANCELED">Canceled</option>
+                <option value="EXPIRED">Expired</option>
             </select>
 
             <div class="modal-actions">
@@ -155,7 +186,38 @@
             </select>
 
             <label>Date</label>
-            <input type="date" name="date" required>
+            <input type="hidden" id="addDate" name="date">
+            <div class="date-dropdowns">
+                <select id="addDay" class="modal-select" required>
+                    <option value="">Day</option>
+                    {% for d in range(1, 32) %}
+                    <option value="{{ d }}">{{ d }}</option>
+                    {% endfor %}
+                </select>
+                <select id="addMonth" class="modal-select" required>
+                    <option value="">Month</option>
+                    <option value="01">January</option>
+                    <option value="02">February</option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+                <select id="addYear" class="modal-select" required>
+                    <option value="">Year</option>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                </select>
+            </div>
 
             <label>Time</label>
             <select name="time" class="modal-select" required>
@@ -191,7 +253,10 @@
         document.getElementById('editEmail').value = d.email;
         document.getElementById('editPhone').value = d.phone;
         document.getElementById('editGuests').value = d.guests;
-        document.getElementById('editDate').value = d.date;
+        const dateParts = d.date.split('-');
+        document.getElementById('editYear').value = dateParts[0];
+        document.getElementById('editMonth').value = dateParts[1];
+        document.getElementById('editDay').value = parseInt(dateParts[2]);
         document.getElementById('editTime').value = d.time;
         document.getElementById('editStatus').value = d.status;
         document.getElementById('editBookingForm').action = '/dashboard/bookings/edit/' + d.id;
@@ -202,6 +267,20 @@
     }
     document.getElementById('editBookingModal').addEventListener('click', function(e) {
         if (e.target === this) closeEditModal();
+    });
+
+    document.getElementById('editBookingForm').addEventListener('submit', function() {
+        const day = String(document.getElementById('editDay').value).padStart(2, '0');
+        const month = document.getElementById('editMonth').value;
+        const year = document.getElementById('editYear').value;
+        document.getElementById('editDate').value = year + '-' + month + '-' + day;
+    });
+
+    document.querySelector('#addBookingModal form').addEventListener('submit', function() {
+        const day = String(document.getElementById('addDay').value).padStart(2, '0');
+        const month = document.getElementById('addMonth').value;
+        const year = document.getElementById('addYear').value;
+        document.getElementById('addDate').value = year + '-' + month + '-' + day;
     });
 </script>
 
