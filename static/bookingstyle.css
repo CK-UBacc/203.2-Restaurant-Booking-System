@@ -51,7 +51,7 @@ hr {
     margin: 50px 0;
 }
 
-/* Black button with white text */
+
 button {
     width: 100%;
     padding: 12px;
@@ -65,4 +65,21 @@ button {
 
 button:hover {
     background-color: #066112;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo {
+    width: 200px; 
+    height: auto;
+    display: block;
+    margin: 0 auto 15px auto;
+}
+
+.form-header h1 {
+    margin: 0;
+    font-size: 2rem;
 }

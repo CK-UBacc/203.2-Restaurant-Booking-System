@@ -3,15 +3,20 @@
 
 <head>
   
-  <link rel="stylesheet" href="static/bookingstyle.css">>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bookingstyle.css') }}">
 
 </head>
 
 <body>
 <form id="bookingForm" method="POST" action="{{ url_for('booking') }}">
     
+
+  <div class="form-header"> 
+    <img src="{{ url_for('static', filename='tableflowlogo.png') }}" class="logo">
+  </div>
+
   <label for="name">First Name</label>
-    <input type="text" name="name" placeholder="John Doe" pattern=[A-Z\sa-z]{3,20} required>
+    <input type="text" name="name" placeholder="John Doe" required>
     <br>
  
   
