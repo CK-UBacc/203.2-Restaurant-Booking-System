@@ -7,25 +7,103 @@
 
 {% block content %}
 
-<section class="dash-card">
-    <div class="dash-card-header">
-        <h2>Table Floor Plan</h2>
+<!-- Stat cards -->
+<section class="dash-stats">
+    <div class="stat-card">
+        <div>
+            <p class="stat-label">Total Tables</p>
+            <p class="stat-value">{{ tables | length }}</p>
+        </div>
     </div>
-    <div class="table-grid">
-        {% for table in tables %}
-        <div class="table-cell">
-            <span>Table {{ table.id }}</span>
-            <small>{{ table.seats }} seats</small>
-            <button type="button" class="btn"
-                data-id="{{ table.id }}"
-                data-seats="{{ table.seats }}"
-                onclick="openEditTableModal(this)">Edit</button>
+    <div class="stat-card">
+        <div>
+            <p class="stat-label">Available</p>
+            <p class="stat-value">{{ available_count }}</p>
         </div>
-        {% endfor %}
-        <div class="table-cell table-cell-add" onclick="openAddTableModal()">
-            <span class="add-table-icon">+</span>
-            <small>Add Table</small>
+    </div>
+    <div class="stat-card">
+        <div>
+            <p class="stat-label">Occupied</p>
+            <p class="stat-value">{{ occupied_count }}</p>
         </div>
+    </div>
+    <div class="stat-card">
+        <div>
+            <p class="stat-label">Total Seats</p>
+            <p class="stat-value">{{ total_seats }}</p>
+        </div>
+    </div>
+</section>
+
+<!-- Floor Plan -->
+<section class="dash-card" style="padding:0; overflow:hidden;">
+    <div class="dash-card-header" style="padding:1.25rem 1.5rem;">
+        <h2>Table Floor Plan</h2>
+        <div class="dash-card-header-right">
+            <div class="floor-legend">
+                <span class="legend-dot legend-available"></span><span>Available</span>
+                <span class="legend-dot legend-occupied"></span><span>Occupied</span>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="openAddTableModal()">+ Add Table</button>
+        </div>
+    </div>
+
+    <!-- Rectangular room boundary -->
+    <div class="floor-room">
+        <div class="floor-grid">
+            {% for table in tables %}
+            <div class="floor-box {{ 'floor-box-occupied' if table.status == 'OCCUPIED' else '' }}"
+                 data-id="{{ table.id }}"
+                 data-seats="{{ table.seats }}"
+                 data-status="{{ table.status }}"
+                 onclick="openEditTableModal(this)">
+                <div class="floor-box-circle">{{ table.id }}</div>
+                <div class="floor-box-seats">{{ table.seats }} seats</div>
+                <div class="floor-box-status">
+                    {{ 'Occupied' if table.status == 'OCCUPIED' else 'Available' }}
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Add new table cell -->
+            <div class="floor-box floor-box-add" onclick="openAddTableModal()">
+                <div class="floor-box-add-icon">+</div>
+                <div class="floor-box-seats">Add Table</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Today's Bookings -->
+<section class="dash-card dash-card-wide">
+    <div class="dash-card-header">
+        <h2>Today's Bookings</h2>
+    </div>
+    <div class="table-responsive">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Guests</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in today_bookings %}
+                <tr>
+                    <td>{{ booking.name }}</td>
+                    <td>{{ booking.guestCount }}</td>
+                    <td>{{ booking.time.strftime('%I:%M %p') }}</td>
+                    <td><span class="badge badge-{{ booking.status | lower }}">{{ booking.status }}</span></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="dash-empty">No bookings for today.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </section>
 
@@ -39,7 +117,6 @@
         <form method="POST" action="{{ url_for('dashboardTablesAdd') }}" class="dash-form modal-form">
             <label>Number of Seats</label>
             <input type="number" name="seats" min="1" max="20" placeholder="e.g. 4" required>
-
             <div class="modal-actions">
                 <button type="button" class="btn btn-cancel" onclick="closeAddTableModal()">Cancel</button>
                 <button type="submit" class="btn btn-primary">Add Table</button>
@@ -55,17 +132,24 @@
             <h2 id="editTableTitle">Edit Table</h2>
             <button type="button" class="modal-close" onclick="closeEditTableModal()">&times;</button>
         </div>
+
+        <p id="editTableStatusLabel" style="margin-bottom:1rem; font-size:0.9rem;"></p>
+
         <form id="editTableForm" method="POST" class="dash-form modal-form">
             <label>Number of Seats</label>
             <input type="number" id="editTableSeats" name="seats" min="1" max="20" required>
-
             <div class="modal-actions">
                 <button type="button" class="btn btn-cancel" onclick="closeEditTableModal()">Cancel</button>
                 <button type="submit" class="btn btn-primary">Save Changes</button>
             </div>
         </form>
 
-        <form id="deleteTableForm" method="POST" style="margin-top: 1rem;">
+        <!-- Toggle availability -->
+        <form id="toggleTableForm" method="POST" style="margin-top:0.75rem;">
+            <button type="submit" id="toggleTableBtn" class="btn" style="width:100%;"></button>
+        </form>
+
+        <form id="deleteTableForm" method="POST" style="margin-top:0.5rem;">
             <button type="button" class="btn btn-danger" style="width:100%;" onclick="openDeleteConfirm()">Delete Table</button>
         </form>
     </div>
@@ -87,43 +171,57 @@
 </div>
 
 <script>
-    function openAddTableModal() {
-        document.getElementById('addTableModal').style.display = 'flex';
-    }
-    function closeAddTableModal() {
-        document.getElementById('addTableModal').style.display = 'none';
-    }
+    function openAddTableModal()  { document.getElementById('addTableModal').style.display  = 'flex'; }
+    function closeAddTableModal() { document.getElementById('addTableModal').style.display  = 'none'; }
     document.getElementById('addTableModal').addEventListener('click', function(e) {
         if (e.target === this) closeAddTableModal();
     });
 
     function openEditTableModal(btn) {
-        const id = btn.dataset.id;
-        const seats = btn.dataset.seats;
-        document.getElementById('editTableTitle').textContent = 'Edit Table ' + id;
-        document.getElementById('editTableSeats').value = seats;
-        document.getElementById('editTableForm').action = '/dashboard/tables/edit/' + id;
-        document.getElementById('deleteTableForm').action = '/dashboard/tables/delete/' + id;
+        var id     = btn.dataset.id;
+        var seats  = btn.dataset.seats;
+        var status = btn.dataset.status; /* AVAILABLE or OCCUPIED */
+
+        document.getElementById('editTableTitle').textContent = 'Table ' + id;
+        document.getElementById('editTableSeats').value       = seats;
+        document.getElementById('editTableForm').action       = '/dashboard/tables/edit/'   + id;
+        document.getElementById('deleteTableForm').action     = '/dashboard/tables/delete/' + id;
+        document.getElementById('toggleTableForm').action     = '/dashboard/tables/toggle/' + id;
+
+        /* Status label */
+        var labelEl = document.getElementById('editTableStatusLabel');
+        if (status === 'OCCUPIED') {
+            labelEl.innerHTML = 'Status: <span class="badge badge-expired">Occupied</span>';
+        } else {
+            labelEl.innerHTML = 'Status: <span class="badge badge-approved">Available</span>';
+        }
+
+        /* Toggle button */
+        var toggleBtn = document.getElementById('toggleTableBtn');
+        if (status === 'OCCUPIED') {
+            toggleBtn.textContent = 'Mark as Available';
+            toggleBtn.className   = 'btn btn-primary';
+        } else {
+            toggleBtn.textContent = 'Mark as Occupied';
+            toggleBtn.className   = 'btn';
+        }
+
         document.getElementById('editTableModal').style.display = 'flex';
     }
-    function closeEditTableModal() {
-        document.getElementById('editTableModal').style.display = 'none';
-    }
+    function closeEditTableModal() { document.getElementById('editTableModal').style.display = 'none'; }
     document.getElementById('editTableModal').addEventListener('click', function(e) {
         if (e.target === this) closeEditTableModal();
     });
 
     function openDeleteConfirm() {
-        document.getElementById('editTableModal').style.display = 'none';
+        document.getElementById('editTableModal').style.display    = 'none';
         document.getElementById('deleteConfirmModal').style.display = 'flex';
     }
     function closeDeleteConfirm() {
         document.getElementById('deleteConfirmModal').style.display = 'none';
-        document.getElementById('editTableModal').style.display = 'flex';
+        document.getElementById('editTableModal').style.display    = 'flex';
     }
-    function confirmDelete() {
-        document.getElementById('deleteTableForm').submit();
-    }
+    function confirmDelete() { document.getElementById('deleteTableForm').submit(); }
     document.getElementById('deleteConfirmModal').addEventListener('click', function(e) {
         if (e.target === this) closeDeleteConfirm();
     });

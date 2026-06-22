@@ -157,6 +157,15 @@ body {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    text-decoration: none;
+    color: inherit;
+    padding: 0.4rem 0.6rem;
+    border-radius: var(--radius);
+    transition: background-color 0.15s ease;
+}
+
+.dash-user:hover {
+    background-color: var(--color-gray-100);
 }
 
 .dash-user small {
@@ -554,11 +563,29 @@ main {
     border-radius: var(--radius);
     padding: 0.5rem 0.75rem;
     font-size: 0.95rem;
+    font-family: inherit;
     color: var(--color-black);
     background-color: var(--color-white);
 }
 
 .dash-form input:focus {
+    outline: 2px solid var(--color-black);
+    outline-offset: 1px;
+}
+
+.modal-textarea {
+    width: 100%;
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: var(--color-black);
+    background-color: var(--color-white);
+    resize: vertical;
+}
+
+.modal-textarea:focus {
     outline: 2px solid var(--color-black);
     outline-offset: 1px;
 }
@@ -797,4 +824,445 @@ body.login-page {
 
 .login-btn:hover {
     background-color: var(--color-gray-700);
+}
+
+/* ---------------------------------------------------------------------
+   Table Floor Plan (dashboardTables)
+--------------------------------------------------------------------- */
+
+.dash-card-header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Rectangular room boundary */
+.floor-room {
+    padding: 1.25rem 1.5rem 1.5rem;
+    background-color: var(--color-gray-100);
+    border-top: 1px solid var(--color-gray-200);
+}
+
+/* Grid of table cells inside the room */
+.floor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.85rem;
+    background-color: var(--color-gray-100);
+    border: 3px solid var(--color-black);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    min-height: 220px;
+}
+
+/* Each square table cell */
+.floor-box {
+    aspect-ratio: 1;
+    background-color: var(--color-white);
+    border: 2px solid var(--color-black);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    padding: 0.5rem;
+}
+
+.floor-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+}
+
+/* Round table icon inside the square cell */
+.floor-box-circle {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 2.5px solid var(--color-black);
+    background-color: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-black);
+    flex-shrink: 0;
+}
+
+.floor-box-seats {
+    font-size: 0.72rem;
+    color: var(--color-gray-500);
+    text-align: center;
+}
+
+.floor-box-status {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-gray-400);
+    text-align: center;
+}
+
+/* Occupied state dark fill */
+.floor-box-occupied {
+    background-color: var(--color-black);
+    border-color: var(--color-black);
+}
+
+.floor-box-occupied .floor-box-circle {
+    background-color: var(--color-gray-700);
+    border-color: var(--color-gray-500);
+    color: var(--color-white);
+}
+
+.floor-box-occupied .floor-box-seats,
+.floor-box-occupied .floor-box-status {
+    color: var(--color-gray-300);
+}
+
+/* Add table cell */
+.floor-box-add {
+    border: 2px dashed var(--color-gray-300);
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.floor-box-add:hover {
+    background-color: var(--color-gray-200);
+    box-shadow: none;
+    transform: none;
+}
+
+.floor-box-add-icon {
+    font-size: 1.75rem;
+    font-weight: 300;
+    color: var(--color-gray-400);
+    line-height: 1;
+}
+
+/* Legend */
+.floor-legend {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+    color: var(--color-gray-500);
+}
+
+.legend-dot {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--color-black);
+    flex-shrink: 0;
+}
+
+.legend-available { background-color: var(--color-white); }
+.legend-occupied  { background-color: var(--color-black); }
+
+/* ---------------------------------------------------------------------
+   Settings page
+--------------------------------------------------------------------- */
+
+.settings-form {
+    max-width: 100%;
+}
+
+.settings-form input[type="text"],
+.settings-form input[type="email"],
+.settings-form input[type="tel"],
+.settings-form input[type="number"],
+.settings-form input[type="time"] {
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: var(--color-black);
+    background-color: var(--color-white);
+    width: 100%;
+}
+
+.settings-form input:focus {
+    outline: 2px solid var(--color-black);
+    outline-offset: 1px;
+}
+
+.settings-actions {
+    margin-top: 0.5rem;
+}
+
+.settings-input-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.settings-input-row input {
+    flex: 1;
+}
+
+.input-unit {
+    font-size: 0.85rem;
+    color: var(--color-gray-500);
+    white-space: nowrap;
+}
+
+.label-hint {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--color-gray-400);
+}
+
+.settings-rule-hint {
+    font-size: 0.85rem;
+    color: var(--color-gray-500);
+    background-color: var(--color-gray-100);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius);
+    padding: 0.65rem 0.85rem;
+    line-height: 1.6;
+}
+
+/* Days-of-week picker */
+
+.days-picker {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.day-checkbox {
+    cursor: pointer;
+}
+
+/* Hide the real checkbox clicking the label still toggles it */
+.day-checkbox input[type="checkbox"] {
+    display: none;
+}
+
+/* The visible pill */
+.day-checkbox span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 2px solid var(--color-gray-200);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-gray-400);
+    background-color: var(--color-white);
+    user-select: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+/* Checked state fills black */
+.day-checkbox input[type="checkbox"]:checked + span {
+    background-color: var(--color-black);
+    border-color: var(--color-black);
+    color: var(--color-white);
+}
+
+/* Hover on unchecked */
+.day-checkbox:hover span {
+    border-color: var(--color-gray-500);
+    color: var(--color-black);
+}
+
+/* Hover on checked */
+.day-checkbox input[type="checkbox"]:checked ~ span,
+.day-checkbox:hover input[type="checkbox"]:checked + span {
+    background-color: var(--color-gray-700);
+    border-color: var(--color-gray-700);
+}
+
+/* Time slot grid */
+
+.timeslot-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.timeslot-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--color-gray-100);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--color-gray-400);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    transition: color 0.15s, background-color 0.15s;
+}
+
+.btn-icon:hover {
+    color: var(--color-black);
+    background-color: var(--color-gray-200);
+}
+
+/* ---------------------------------------------------------------------
+   Index / Landing Page
+--------------------------------------------------------------------- */
+
+body.index-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-gray-100);
+}
+
+.index-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 2rem;
+    background-color: var(--color-white);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.index-brand {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--color-black);
+}
+
+.index-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+    padding: 4rem 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.index-hero {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.index-hero-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-black);
+}
+
+.index-hero-desc {
+    font-size: 1.1rem;
+    color: var(--color-gray-500);
+    max-width: 520px;
+    line-height: 1.7;
+}
+
+.index-hero-cta {
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+.index-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    width: 100%;
+}
+
+.index-info-card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    box-shadow: var(--shadow);
+}
+
+.index-info-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-gray-400);
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+}
+
+.index-info-value {
+    font-size: 0.95rem;
+    color: var(--color-black);
+    font-weight: 500;
+}
+
+.index-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--color-white);
+    border-top: 1px solid var(--color-gray-200);
+    font-size: 0.85rem;
+    color: var(--color-gray-500);
+}
+
+.index-footer-link {
+    color: var(--color-gray-400);
+    text-decoration: none;
+    font-size: 0.85rem;
+}
+
+.index-footer-link:hover {
+    color: var(--color-black);
+}
+
+/* ---------------------------------------------------------------------
+   Error Page (404, 500, etc.)
+--------------------------------------------------------------------- */
+
+body.error-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-black);
+}
+
+.error-card {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.error-code {
+    font-size: 6rem;
+    font-weight: 700;
+    color: var(--color-white);
+    line-height: 1;
+}
+
+.error-message {
+    font-size: 1.1rem;
+    color: var(--color-gray-400);
+    margin-bottom: 0.5rem;
 }

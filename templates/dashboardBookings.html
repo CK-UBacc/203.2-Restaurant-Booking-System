@@ -23,6 +23,7 @@
                     <th>Date & time</th>
                     <th>Guests</th>
                     <th>Status</th>
+                    <th>Special Requests</th>
                     <th>Edit Booking</th>
                 </tr>
             </thead>
@@ -36,6 +37,13 @@
                     <td>{{ booking.date.strftime('%d %b %Y') }} · {{ booking.time.strftime('%I:%M %p') }}</td>
                     <td>{{ booking.guestCount }}</td>
                     <td><span class="badge badge-{{ booking.status | lower }}">{{ booking.status }}</span></td>
+                    <td class="td-requests" title="{{ booking.special_requests or '' }}">
+                        {% if booking.special_requests %}
+                            {{ booking.special_requests[:40] }}{% if booking.special_requests | length > 40 %}...{% endif %}
+                        {% else %}
+                            <span style="color:var(--color-gray-400);">-</span>
+                        {% endif %}
+                    </td>
                     <td>
                         <button type="button" class="btn"
                             data-id="{{ booking.id }}"
@@ -46,6 +54,7 @@
                             data-date="{{ booking.date }}"
                             data-time="{{ booking.time.strftime('%H:%M:%S') }}"
                             data-status="{{ booking.status }}"
+                            data-requests="{{ booking.special_requests or '' }}"
                             onclick="openEditModal(this)">Edit Booking</button>
                     </td>
                 </tr>
@@ -58,7 +67,7 @@
         
                 {% else %}
                 <tr>
-                    <td colspan="8" class="dash-empty">No bookings yet.</td>
+                    <td colspan="9" class="dash-empty">No bookings yet.</td>
                 </tr>
                 {% endfor %}
                
@@ -147,6 +156,10 @@
                 <option value="EXPIRED">Expired</option>
             </select>
 
+            <label>Special Requests</label>
+            <textarea id="editSpecialRequests" name="special_requests" class="modal-textarea"
+                placeholder="Dietary requirements, allergies, seating preferences..." rows="3"></textarea>
+
             <div class="modal-actions">
                 <button type="button" class="btn btn-cancel" onclick="closeEditModal()">Cancel</button>
                 <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -227,6 +240,10 @@
                 {% endfor %}
             </select>
 
+            <label>Special Requests</label>
+            <textarea name="special_requests" class="modal-textarea"
+                placeholder="Dietary requirements, allergies, seating preferences..." rows="3"></textarea>
+
             <div class="modal-actions">
                 <button type="button" class="btn btn-cancel" onclick="closeAddBookingModal()">Cancel</button>
                 <button type="submit" class="btn btn-primary">Confirm Booking</button>
@@ -259,6 +276,7 @@
         document.getElementById('editDay').value = parseInt(dateParts[2]);
         document.getElementById('editTime').value = d.time;
         document.getElementById('editStatus').value = d.status;
+        document.getElementById('editSpecialRequests').value = d.requests || '';
         document.getElementById('editBookingForm').action = '/dashboard/bookings/edit/' + d.id;
         document.getElementById('editBookingModal').style.display = 'flex';
     }
