@@ -38,7 +38,7 @@
     <section class="dash-card dash-card-wide">
         <div class="dash-card-header">
             <h2>Recent Bookings</h2>
-            <a href="{{ url_for('dashboardBookings') }}" class="dash-link">View all →</a>
+            <a href="{{ url_for('dashboard.dashboardBookings') }}" class="dash-link">View all →</a>
         </div>
         <div class="table-responsive">
             <table class="dash-table">
@@ -75,7 +75,7 @@
     <section class="dash-card">
         <div class="dash-card-header">
             <h2>Table Floor Plan</h2>
-            <a href="{{ url_for('dashboardTables') }}" class="dash-link">Manage tables →</a>
+            <a href="{{ url_for('dashboard.dashboardTables') }}" class="dash-link">Manage tables →</a>
         </div>
         <div class="table-grid">
             {% for table in tables %}

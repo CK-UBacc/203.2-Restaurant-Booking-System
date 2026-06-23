@@ -6,7 +6,7 @@
 </head>
 
 <body>
-<form id="bookingForm" method="POST" action="{{ url_for('booking') }}">
+<form id="bookingForm" method="POST" action="{{ url_for('view.booking') }}">
     
   <label for="name">First Name</label>
     <input type="text" name="name" placeholder="John Doe" pattern=[A-Z\sa-z]{3,20} required>

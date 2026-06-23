@@ -16,13 +16,13 @@
         </div>
 
         <nav class="dash-nav">
-            <a href="{{ url_for('dashboard') }}" class="dash-nav-link {{ 'active' if active == 'overview' else '' }}">Overview</a>
-            <a href="{{ url_for('dashboardBookings') }}" class="dash-nav-link {{ 'active' if active == 'bookings' else '' }}">Manage Bookings</a>
-            <a href="{{ url_for('dashboardTables') }}" class="dash-nav-link {{ 'active' if active == 'tables' else '' }}">Manage Tables</a>
+            <a href="{{ url_for('dashboard.dashboardIndex') }}" class="dash-nav-link {{ 'active' if active == 'overview' else '' }}">Overview</a>
+            <a href="{{ url_for('dashboard.dashboardBookings') }}" class="dash-nav-link {{ 'active' if active == 'bookings' else '' }}">Manage Bookings</a>
+            <a href="{{ url_for('dashboard.dashboardTables') }}" class="dash-nav-link {{ 'active' if active == 'tables' else '' }}">Manage Tables</a>
         </nav>
 
         <div class="dash-sidebar-footer">
-            <a href="{{ url_for('index') }}" class="dash-logout">Back to site</a>
+            <a href="{{ url_for('view.index') }}" class="dash-logout">Back to site</a>
         </div>
     </aside>
 

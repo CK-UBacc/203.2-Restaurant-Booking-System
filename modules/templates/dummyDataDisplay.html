@@ -41,7 +41,7 @@
         {% endfor %}
     </select>
 
-    <form id="tableInputs" method="POST" action="{{ url_for('dummyTablesUpdate') }}">
+    <form id="tableInputs" method="POST" action="{{ url_for('view.dummyTablesUpdate') }}">
         <label for="seatsInput">Table seats:</label>
         <input type="text" id="seatsInput" name="seatsInput" placeholder="Input number of seats" required>
         <input type="submit" value="Do thing">
