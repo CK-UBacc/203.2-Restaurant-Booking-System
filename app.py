@@ -6,7 +6,7 @@ from wtformsTesting import TestBookingForm
 # import os # not currently being used?
 import datetime
 import calendar as cal_module
-from wtformsTesting import TestBookingForm
+# from wtformsTesting import TestBookingForm
 
 app = Flask(__name__)
 
@@ -767,7 +767,6 @@ def dashboardStatistics():
         active="statistics"
     )
 
-
 @app.route("/dummyData", methods=["GET"])
 def dummyData():
     '''
@@ -782,14 +781,11 @@ def dummyData():
     tables = Table.query.all()
     bookings = Booking.query.all()
     timeSlots = TimeSlot.query.all()
-    testBooking = TestBookingForm()
-    testBooking.process()
 
     return render_template("dummyDataDisplay.html", 
                            tables=tables, 
                            bookings=bookings,
-                           timeSlots=timeSlots,
-                           testBooking=testBooking
+                           timeSlots=timeSlots
                            )
 
 @app.route("/loginpage", methods=["GET","POST"])
