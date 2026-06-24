@@ -288,7 +288,7 @@ def loginpage():
         username = request.form.get("AdminUsername")
         password = request.form.get("Adminpassword")
 
-        remember_me = request.form.get("remember_me") = "on"
+        remember_me = request.form.get("remember_me") == "on"
 
         if username == "admin" and password == "password":
             session["logged_in"] = True
