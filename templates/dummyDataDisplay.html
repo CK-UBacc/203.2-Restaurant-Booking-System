@@ -74,9 +74,19 @@
                         <td>{{ booking.email }}</td>
                         <td>{{ booking.date }}</td>
                         <td>{{ booking.time }}</td>
-                        <td>{{ booking.status }}</td>
+                        <td>
+                            <form method="POST">
+                                {{ testBooking.status(class="form-control") }}
+                            </form>
+
+                        </td>
                     </tr>
                     {% endfor %}
+                    <!--<select name="bookingStatus">
+                                <option value="PENDING">PENDING</option>
+                                <option value="APPROVED">APPROVED</option>
+                                <option value="CANCELED">CANCELED</option>
+                            </select>-->
                 </tbody>
             </table>
             {% else %}

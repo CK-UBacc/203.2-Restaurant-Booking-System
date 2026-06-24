@@ -46,7 +46,6 @@ class Table(database.Model):
     def __repr__(self):
         return f"{self.id}: {self.seats}"
 
-
 class Booking(database.Model):
     __tablename__ = "bookings"
 
@@ -371,7 +370,6 @@ def booking():
 def bookingSuccess(booking_id):
     booking = Booking.query.get_or_404(booking_id)
     return render_template("bookingSuccess.html", booking=booking)
-
 
 @app.route("/dashboard", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
 def dashboard():
@@ -725,10 +723,14 @@ def dummyData():
     tables = Table.query.all()
     bookings = Booking.query.all()
     timeSlots = TimeSlot.query.all()
+    testBooking = TestBookingForm()
+    testBooking.process()
+
     return render_template("dummyDataDisplay.html", 
                            tables=tables, 
                            bookings=bookings,
-                           timeSlots=timeSlots
+                           timeSlots=timeSlots,
+                           testBooking=testBooking
                            )
 
 # Admin Account for Loginpage
