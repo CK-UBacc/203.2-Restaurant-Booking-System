@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Received{% if restaurant_settings %} - {{ restaurant_settings.restaurant_name }}{% endif %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="booking-page">
+
+    <header class="booking-header">
+        <span class="booking-brand">
+            {{ restaurant_settings.restaurant_name if restaurant_settings else "TableFlow" }}
+        </span>
+    </header>
+
+    <main class="booking-success-main">
+
+        <div class="booking-success-card">
+
+            <!-- Icon -->
+            <div class="booking-success-icon">
+                <svg viewBox="0 0 52 52" fill="none" >
+                    <circle cx="26" cy="26" r="25" stroke="currentColor" stroke-width="2"/>
+                    <path d="M14 26.5l8 8 16-16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+
+            <!-- Heading -->
+            <h1 class="booking-success-title">Booking Received!</h1>
+            <p class="booking-success-sub">
+                {% if booking.status == 'APPROVED' %}
+                Your reservation has been confirmed. We look forward to seeing you!
+                {% else %}
+                Thank you! We'll review your request and send a confirmation email shortly.
+                {% endif %}
+            </p>
+
+            <!-- Booking summary -->
+            <div class="booking-success-summary">
+                <div class="booking-success-ref">
+                    Booking Reference: <strong>#{{ booking.id }}</strong>
+                </div>
+
+                <div class="booking-success-rows">
+                    <div class="booking-success-row">
+                        <span class="booking-success-label">Name</span>
+                        <span class="booking-success-value">{{ booking.name }}</span>
+                    </div>
+                    <div class="booking-success-row">
+                        <span class="booking-success-label">Date</span>
+                        <span class="booking-success-value">{{ booking.date.strftime('%A, %d %B %Y') }}</span>
+                    </div>
+                    <div class="booking-success-row">
+                        <span class="booking-success-label">Time</span>
+                        <span class="booking-success-value">{{ booking.time.strftime('%I:%M %p') }}</span>
+                    </div>
+                    <div class="booking-success-row">
+                        <span class="booking-success-label">Guests</span>
+                        <span class="booking-success-value">{{ booking.guestCount }} {{ 'person' if booking.guestCount == 1 else 'people' }}</span>
+                    </div>
+                    {% if booking.tables %}
+                    <div class="booking-success-row">
+                        <span class="booking-success-label">Table</span>
+                        <span class="booking-success-value">Table {{ booking.tables[0].id }} ({{ booking.tables[0].seats }} seats)</span>
+                    </div>
+                    {% endif %}
+                    <div class="booking-success-row">
+                        <span class="booking-success-label">Status</span>
+                        <span class="booking-success-value">
+                            {% if booking.status == 'APPROVED' %}
+                            <span class="booking-success-badge booking-success-badge-approved">Approved</span>
+                            {% else %}
+                            <span class="booking-success-badge booking-success-badge-pending">Pending Review</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% if booking.special_requests %}
+                    <div class="booking-success-row">
+                        <span class="booking-success-label">Special Requests</span>
+                        <span class="booking-success-value">{{ booking.special_requests }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Email note -->
+            {% if booking.email %}
+            <p class="booking-success-email-note">
+                A confirmation has been sent to <strong>{{ booking.email }}</strong>
+            </p>
+            {% endif %}
+
+            <!-- Action -->
+            <a href="{{ url_for('booking') }}" class="booking-success-btn">Make Another Booking</a>
+
+        </div>
+
+    </main>
+
+    <footer class="booking-footer">
+        <span>{{ restaurant_settings.restaurant_name if restaurant_settings else "TableFlow" }}</span>
+        <span>Reservations are subject to availability and confirmation</span>
+    </footer>
+
+</body>
+</html>

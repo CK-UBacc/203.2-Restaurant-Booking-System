@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ restaurant_settings.restaurant_name if restaurant_settings else 'TableFlow' }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="im-page">
+
+    <!-- NAV -->
+    <header class="im-header">
+        <nav class="im-nav">
+            <div class="im-brand">
+                <span class="im-brand-name">
+                    {{ restaurant_settings.restaurant_name if restaurant_settings else 'TableFlow' }}
+                </span>
+            </div>
+            <div class="im-nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How it works</a>
+                <a href="#reviews">Reviews</a>
+                <a href="#faq">FAQ</a>
+            </div>
+            <div class="im-nav-cta">
+                <a href="{{ url_for('loginpage') }}" class="im-login">Log in</a>
+                <a href="{{ url_for('indexDemo') }}" class="im-demo-nav">
+                    <span class="im-dot"></span>
+                    Demo
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="im-hero">
+        <div>
+            <div class="im-badge">
+                <span class="im-pulse-dot"></span>
+                Online reservations open 24/7
+            </div>
+            <h1 class="im-hero-h1">
+                Reserve your table,<br>dine with <span class="im-hero-accent">ease</span>.
+            </h1>
+            <p class="im-hero-p">
+                {% if restaurant_settings and restaurant_settings.description %}
+                {{ restaurant_settings.description }}
+                {% else %}
+                Book your table online in seconds. Choose your date, time and group size - we'll take care of the rest.
+                {% endif %}
+            </p>
+            <div class="im-hero-actions">
+                <a href="{{ url_for('indexDemo') }}" class="im-btn-primary">
+                    <span class="im-btn-dot"></span>
+                    Demo
+                </a>
+                <a href="#how-it-works" class="im-btn-secondary">
+                    <span class="im-btn-play">&#9654;</span>
+                    How it works
+                </a>
+            </div>
+        </div>
+
+        <!-- PRODUCT MOCKP -->
+        <div class="im-mockup">
+            <div class="im-mockup-glow"></div>
+            <div class="im-mockup-card">
+                <div class="im-mockup-bar">
+                    <span class="im-mockup-dot"></span>
+                    <span class="im-mockup-dot"></span>
+                    <span class="im-mockup-dot"></span>
+                    <span class="im-mockup-url">{{ restaurant_settings.restaurant_name if restaurant_settings else 'TableFlow' }}</span>
+                </div>
+                <div class="im-mockup-body">
+                    <div class="im-mockup-head">
+                        <div>
+                            <div class="im-mockup-title">Today's bookings</div>
+                            <div class="im-mockup-sub">Real-time availabilty</div>
+                        </div>
+                        <div class="im-status-open">Tables open</div>
+                    </div>
+                    <div class="im-booking-list">
+                        <div class="im-booking-item">
+                            <div class="im-booking-time">11:00</div>
+                            <div class="im-booking-info">
+                                <div class="im-booking-name">Vinh</div>
+                                <div class="im-booking-detail">Table 3 - 2 guests</div>
+                            </div>
+                            <span class="im-badge-green">Confirmed</span>
+                        </div>
+                        <div class="im-booking-item im-booking-item-alt">
+                            <div class="im-booking-time">12:30</div>
+                            <div class="im-booking-info">
+                                <div class="im-booking-name">Chris</div>
+                                <div class="im-booking-detail">Table 7 - 4 guests</div>
+                            </div>
+                            <span class="im-badge-amber">Pending</span>
+                        </div>
+                        <div class="im-booking-item">
+                            <div class="im-booking-time">18:00</div>
+                            <div class="im-booking-info">
+                                <div class="im-booking-name">Byron</div>
+                                <div class="im-booking-detail">Table 5 - 6 guests</div>
+                            </div>
+                            <span class="im-badge-green">Confirmed</span>
+                        </div>
+                    </div>
+                    <div class="im-floor">
+                        <div class="im-floor-label">Floor plan</div>
+                        <div class="im-floor-grid">
+                            <div class="im-tcell im-tcell-avail">1</div>
+                            <div class="im-tcell im-tcell-booked">2</div>
+                            <div class="im-tcell im-tcell-booked">3</div>
+                            <div class="im-tcell im-tcell-avail">4</div>
+                            <div class="im-tcell im-tcell-avail">5</div>
+                            <div class="im-tcell im-tcell-booked">6</div>
+                            <div class="im-tcell im-tcell-closed">7</div>
+                            <div class="im-tcell im-tcell-avail">8</div>
+                        </div>
+                        <div class="im-floor-legend">
+                            <span class="im-legend-item"><span class="im-ldot im-ldot-avail"></span>Available</span>
+                            <span class="im-legend-item"><span class="im-ldot im-ldot-booked"></span>Booked</span>
+                            <span class="im-legend-item"><span class="im-ldot im-ldot-closed"></span>Closed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="im-float-badge">
+                <div class="im-float-label">Instant confirmation</div>
+                <div class="im-float-val">24/7</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="im-features">
+        <div class="im-section-intro">
+            <div class="im-section-tag">Features</div>
+            <h2 class="im-section-h2">Everything you need for a smooth reservation experience</h2>
+        </div>
+        <div class="im-features-grid">
+            <div class="im-feature-card">
+                <h3 class="im-feature-h3">Online Booking</h3>
+                <p class="im-feature-p">Accept reservations around the clock directly from your website. No phone calls needed.</p>
+            </div>
+            <div class="im-feature-card">
+                <h3 class="im-feature-h3">Live Table View</h3>
+                <p class="im-feature-p">See the real-time status of every table in your restaurant at a glance with the interactive floor plan.</p>
+            </div>
+            <div class="im-feature-card">
+                <h3 class="im-feature-h3">Special Requests</h3>
+                <p class="im-feature-p">Guests can note dietary requirements, allergies, and special occasions so you're always prepared.</p>
+            </div>
+            <div class="im-feature-card">
+                <h3 class="im-feature-h3">Email Confirmation</h3>
+                <p class="im-feature-p">Guests automatically receive a confirmation email with their full booking details right after reserving.</p>
+            </div>
+            <div class="im-feature-card">
+                <h3 class="im-feature-h3">Group Bookings</h3>
+                <p class="im-feature-p">Easily accommodate parties of any size. Guests select the group size and we find the right table.</p>
+            </div>
+            <div class="im-feature-card">
+                <h3 class="im-feature-h3">Booking Analytics</h3>
+                <p class="im-feature-p">Track peak times, approval rates, and booking trends from the staff dashboard to improve service.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how-it-works" class="im-how">
+        <div class="im-how-inner">
+            <div class="im-how-header">
+                <div class="im-how-tag">How it works</div>
+                <h2 class="im-how-h2">Reserve a table in 3 simple steps</h2>
+            </div>
+            <div class="im-steps">
+                <div>
+                    <div class="im-step-num">01</div>
+                    <h3 class="im-step-h3">Fill your details</h3>
+                    <p class="im-step-p">Enter your name, contact information, group size, and any special requests in the booking form.</p>
+                </div>
+                <div>
+                    <div class="im-step-num">02</div>
+                    <h3 class="im-step-h3">Pick a date and time</h3>
+                    <p class="im-step-p">Choose from available time slots and check which tables are free in real time before confirming.</p>
+                </div>
+                <div>
+                    <div class="im-step-num">03</div>
+                    <h3 class="im-step-h3">Get confirmed</h3>
+                    <p class="im-step-p">We review your request and send a confirmation email. You'll have a booking reference to keep track.</p>
+                </div>
+            </div>
+            <div class="im-how-cta">
+                <a href="{{ url_for('indexDemo') }}" class="im-how-btn">
+                    <span class="im-how-btn-dot"></span>
+                    Demo
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONAILS -->
+    <section id="reviews" class="im-reviews">
+        <div class="im-reviews-inner">
+            <div class="im-reviews-header">
+                <div class="im-section-tag">Reviews</div>
+                <h2 class="im-reviews-h2">What our guests say</h2>
+            </div>
+            <div class="im-reviews-grid">
+                <div class="im-review-card">
+                    <div class="im-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    <p class="im-review-quote">"This is the best app I have ever use ."</p>
+                    <div class="im-author">
+                        <span class="im-avatar im-avatar-warm"></span>
+                        <div>
+                            <div class="im-author-name">Chris </div>
+                            <div class="im-author-role">Regular guest</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="im-review-card">
+                    <div class="im-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    <p class="im-review-quote">"Masterpiece, the developers made this app is the best."</p>
+                    <div class="im-author">
+                        <span class="im-avatar im-avatar-green"></span>
+                        <div>
+                            <div class="im-author-name">Vinh </div>
+                            <div class="im-author-role">First time visitor</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="im-faq">
+        <h2 class="im-faq-h2">Frequently asked questions</h2>
+        <div class="im-faq-list">
+            <details class="im-faq-item">
+                <summary class="im-faq-summary">How far in advance can I book?<span class="im-faq-plus">+</span></summary>
+                <p class="im-faq-body">You can book up to {{ restaurant_settings.max_advance_days if restaurant_settings else 30 }} days in advance. We recommend booking early for weekends and special occasions.</p>
+            </details>
+            <details class="im-faq-item">
+                <summary class="im-faq-summary">Can I modify or cancel my booking?<span class="im-faq-plus">+</span></summary>
+                <p class="im-faq-body">Please contact us directly by phone or email to modify or cancel your reservation. We are happy to help as long as you give us enough notice.</p>
+            </details>
+            <details class="im-faq-item">
+                <summary class="im-faq-summary">What is the maximum group size?<span class="im-faq-plus">+</span></summary>
+                <p class="im-faq-body">Our online booking system accepts groups up to {{ restaurant_settings.max_party_size if restaurant_settings else 8 }} guests. For larger parties please call us directly.</p>
+            </details>
+            <details class="im-faq-item">
+                <summary class="im-faq-summary">Will I receive a confirmation?<span class="im-faq-plus">+</span></summary>
+                <p class="im-faq-body">Yes. After submitting your booking you will see a confirmation page with your reference number and receive a confirmation email with all the details.</p>
+            </details>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="im-cta">
+        <div class="im-cta-card">
+            <div class="im-cta-glow"></div>
+            <h2 class="im-cta-h2">Ready to reserve your table?</h2>
+            <p class="im-cta-sub">Book online in under a minute. We look forward to seeing you.</p>
+            <div class="im-cta-actions">
+                <a href="{{ url_for('indexDemo') }}" class="im-cta-btn">
+                    <span class="im-cta-btn-dot"></span>
+                    Demo
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="im-footer">
+        <div class="im-footer-inner">
+            <div class="im-footer-brand">
+                <span class="im-footer-name">
+                    {{ restaurant_settings.restaurant_name if restaurant_settings else 'TableFlow' }}
+                </span>
+            </div>
+            <a href="{{ url_for('loginpage') }}" class="im-footer-login">Staff Login</a>
+        </div>
+    </footer>
+
+</div>
+
+</body>
+</html>

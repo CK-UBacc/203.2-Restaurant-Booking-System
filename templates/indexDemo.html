@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if restaurant_settings %}{{ restaurant_settings.restaurant_name }}{% else %}TableFlow{% endif %} - Reserve a Table</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+{% set name = restaurant_settings.restaurant_name  %}
+{% set address = restaurant_settings.address if restaurant_settings  %}
+{% set phone = restaurant_settings.phone if restaurant_settings  %}
+{% if restaurant_settings and restaurant_settings.open_time and restaurant_settings.close_time %}
+    {% set hours = restaurant_settings.open_time.strftime('%I:%M %p') ~ " - " ~ restaurant_settings.close_time.strftime('%I:%M %p') %}
+{% else %}
+    {% set hours = "5:00 PM - 11:00 PM" %}
+{% endif %}
+
+<body class="rp-page">
+
+    <!-- NAV -->
+    <header class="rp-nav">
+        <nav class="rp-max rp-nav-inner">
+            <div class="rp-nav-brand">
+                <span class="rp-nav-brand-name">{{ name }}</span>
+            </div>
+            <div class="rp-nav-links">
+                <a href="#about" class="rp-nav-link">About</a>
+                <a href="#menu" class="rp-nav-link">Menu</a>
+                <a href="#gallery" class="rp-nav-link">Gallery</a>
+                <a href="#visit" class="rp-nav-link">Visit</a>
+            </div>
+            <a href="#book" class="rp-nav-reserve">Reserve a table</a>
+        </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="rp-hero">
+        <div class="rp-max rp-hero-inner">
+
+            <div>
+                <div class="rp-open-badge">
+                    <span class="rp-open-dot"></span>
+                    Open now - until 11:00 PM
+                </div>
+                <h1 class="rp-hero-h1">
+                    Seasonal plates,<br>poured with <em>warmth</em>
+                </h1>
+                <p class="rp-hero-sub">
+                    {% if restaurant_settings and restaurant_settings.description %}
+                    {{ restaurant_settings.description }}
+                    {% else %}
+                    A neighborhood bistro serving wood-fired classics and natural wine in the heart of Old Town. Open kitchen, candlelit tables, no rush.
+                    {% endif %}
+                </p>
+                <div class="rp-hero-actions">
+                    <a href="#book" class="rp-btn-primary">Reserve a table</a>
+                    <a href="#menu" class="rp-btn-secondary">View menu</a>
+                </div>
+                <div class="rp-hero-meta">
+                    <span><strong>★ 4.8</strong> 1,240 reviews</span>
+                    <span class="rp-meta-divider"></span>
+                    <span>$$ - French - Wine bar</span>
+                </div>
+            </div>
+
+            <div class="rp-hero-right">
+                <img class="rp-hero-img-tall" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=900&q=80" alt="Restaurant interior">
+                <img class="rp-hero-img-sm" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80" alt="Dish">
+                <img class="rp-hero-img-sm" src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600&q=80" alt="Interior">
+            </div>
+
+        </div>
+    </section>
+
+    <!-- STATS STRIP -->
+    <section class="rp-max rp-stats-section">
+        <div class="rp-stats-inner">
+            <div class="rp-stat-item">
+                <div class="rp-stat-num">10 yrs</div>
+                <div class="rp-stat-label">Serving Old Town</div>
+            </div>
+            <div class="rp-stat-item">
+                <div class="rp-stat-num">Wood fire</div>
+                <div class="rp-stat-label">Every main, charcoal-grilled</div>
+            </div>
+            <div class="rp-stat-item">
+                <div class="rp-stat-num">90+</div>
+                <div class="rp-stat-label">Natural wines by the bottle</div>
+            </div>
+            <div class="rp-stat-item">
+                <div class="rp-stat-num">Nightly</div>
+                <div class="rp-stat-label">Live vinyl from 8 PM</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABUOT -->
+    <section id="about" class="rp-about">
+        <div class="rp-max rp-about-inner">
+            <img class="rp-about-img" src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&q=80" alt="Chef and kitchen">
+            <div>
+                <div class="rp-section-tag">Our story</div>
+                <h2 class="rp-section-h2">A table that feels like home</h2>
+                <p class="rp-about-p">
+                    We opened in 2016 with one wood-fired oven and a short and honest menu. Today our kitchen still runs on the same idea: cook with the seasons, source from local farms, and pour wine made by people we know.
+                </p>
+                <div class="rp-about-chips">
+                    <div class="rp-about-chip">
+                        <div class="rp-chip-title">Master Chef</div>
+                        <div class="rp-chip-sub">Vinh Phan</div>
+                    </div>
+                    <div class="rp-about-chip">
+                        <div class="rp-chip-title">{{ tables|length if tables else "40" }}</div>
+                        <div class="rp-chip-sub">Tables available</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MENU HIGHLIGTHS -->
+    <section id="menu" class="rp-menu">
+        <div class="rp-max rp-menu-inner">
+            <div class="rp-menu-header">
+                <div>
+                    <div class="rp-section-tag">Menu</div>
+                    <h2 class="rp-section-h2">Kitchen highlights</h2>
+                </div>
+                <a href="#" class="rp-menu-full-link">See full menu &rarr;</a>
+            </div>
+            <div class="rp-menu-grid">
+                <div class="rp-menu-item">
+                    <div class="rp-menu-item-info">
+                        <div class="rp-menu-item-name">Loin of Dartmoor venison with harissa and carrots</div>
+                        <div class="rp-menu-item-desc">Simon Hulstone pairs venison with carrots in this sweet and earthy dish</div>
+                    </div>
+                    <div class="rp-menu-item-price">$9</div>
+                </div>
+                <div class="rp-menu-item">
+                    <div class="rp-menu-item-info">
+                        <div class="rp-menu-item-name">Native lobster, roasted heritage carrots, carrot purée and buttermilk purée</div>
+                        <div class="rp-menu-item-desc">This intricate lobster and carrot recipe from David Everitt-Matthias is as delicious as it is beautiful</div>
+                    </div>
+                    <div class="rp-menu-item-price">$18</div>
+                </div>
+                <div class="rp-menu-item">
+                    <div class="rp-menu-item-info">
+                        <div class="rp-menu-item-name">Le Tendance</div>
+                        <div class="rp-menu-item-desc">This deliciously indulgent dessert from Xavier Boyer uses rich dark chocolate in three different preparations</div>
+                    </div>
+                    <div class="rp-menu-item-price">$42</div>
+                </div>
+                <div class="rp-menu-item">
+                    <div class="rp-menu-item-info">
+                        <div class="rp-menu-item-name">Dark chocolate cylinder with smoked hazelnut praline and salted milk ice cream</div>
+                        <div class="rp-menu-item-desc">A dazzling chocolate recipe from Lisa Allen which contains an array of tastes and textures</div>
+                    </div>
+                    <div class="rp-menu-item-price">$24</div>
+                </div>
+                <div class="rp-menu-item">
+                    <div class="rp-menu-item-info">
+                        <div class="rp-menu-item-name">Brixham crab with Jerusalem artichoke</div>
+                        <div class="rp-menu-item-desc">Try Simon Hulstone’s light and elegant starter that showcases contrasting textures of Jerusalem artichoke and crab</div>
+                    </div>
+                    <div class="rp-menu-item-price">$12</div>
+                </div>
+                <div class="rp-menu-item">
+                    <div class="rp-menu-item-info">
+                        <div class="rp-menu-item-name">Textures of corn</div>
+                        <div class="rp-menu-item-desc"> spice, crunch, sweetness, colour, bitterness and acidity to a variety of dishes, and it's their diversity that makes them such an amazing ingredient to work with</div>
+                    </div>
+                    <div class="rp-menu-item-price">$22</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section id="gallery" class="rp-gallery">
+        <div class="rp-max">
+            <h2 class="rp-gallery-h2">Inside the bistro</h2>
+            <div class="rp-gallery-grid">
+                <img class="rp-gallery-img" src="https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=500&q=80" alt="Photo">
+                <img class="rp-gallery-img rp-gallery-img-offset" src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=500&q=80" alt="Photo">
+                <img class="rp-gallery-img" src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=500&q=80" alt="Photo">
+                <img class="rp-gallery-img rp-gallery-img-offset" src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=500&q=80" alt="Photo">
+            </div>
+        </div>
+    </section>
+
+    <!-- BOOKING + VISIT -->
+    <section id="book" class="rp-dark-section">
+        <div class="rp-max rp-dark-inner">
+
+            <!-- VISIT INFO -->
+            <div id="visit">
+                <div class="rp-visit-tag">Visit us</div>
+                <h2 class="rp-visit-h2">Find your seat at the table</h2>
+
+                <div class="rp-visit-rows">
+                    <div class="rp-visit-row">
+                        <div>
+                            <div class="rp-visit-row-title">Address</div>
+                            <div class="rp-visit-row-val">{{ address }}</div>
+                        </div>
+                    </div>
+                    <div class="rp-visit-row">
+                        <div>
+                            <div class="rp-visit-row-title">Hours</div>
+                            <div class="rp-visit-row-val">{{ hours }}</div>
+                        </div>
+                    </div>
+                    <div class="rp-visit-row">
+                        <div>
+                            <div class="rp-visit-row-title">Contact</div>
+                            <div class="rp-visit-row-val">{{ phone }}</div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <!-- RESERVATION FORM (same form used in booking.html) -->
+            <div class="rp-reserve-card">
+                <div class="rp-reserve-title">Make a Reservation</div>
+                <p class="rp-reserve-sub">We'll send a confirmation email once your booking is reviewed.</p>
+
+                <form id="bookingForm" method="POST" action="{{ url_for('booking') }}" class="booking-form">
+
+                    <div class="booking-field">
+                        <label class="booking-label">Full Name</label>
+                        <input class="booking-input" type="text" name="name" placeholder="John Doe" pattern="[A-Za-z\s]{3,20}" required>
+                    </div>
+
+                    <div class="booking-row">
+                        <div class="booking-field">
+                            <label class="booking-label">Email Address</label>
+                            <input class="booking-input" type="email" name="email" placeholder="john@email.com" required>
+                        </div>
+                        <div class="booking-field">
+                            <label class="booking-label">Phone Number</label>
+                            <input class="booking-input" type="tel" name="phone" placeholder="04 0000 0000" required>
+                        </div>
+                    </div>
+
+                    <div class="booking-row">
+                        <div class="booking-field">
+                            <label class="booking-label">Reservation Date</label>
+                            <input class="booking-input" type="date" id="inputDate" name="date" min="{{ today.isoformat() }}" required>
+                        </div>
+                        <div class="booking-field">
+                            <label class="booking-label">Reservation Time</label>
+                            <select class="booking-input" id="inputTime" name="time" required>
+                                <option value="">Select a time</option>
+                                <!-- Old dummy timeslot options -->
+                                <!--<option value="6:00PM">6:00PM</option>
+                                <option value="6:30PM">6:30PM</option>
+                                <option value="7:00PM">7:00PM</option>
+                                <option value="7:30PM">7:30PM</option>
+                                <option value="8:00PM">8:00PM</option>
+                                <option value="8:30PM">8:30PM</option>
+                                <option value="9:00PM">9:00PM</option>
+                                <option value="9:30PM">9:30PM</option>
+                                <option value="10:00PM">10:00PM</option>
+                                <option value="10:30PM">10:30PM</option>
+                                <option value="11:00PM">11:00PM</option>-->
+                                {% if timeSlots %}
+                                {% for timeSlot in timeSlots %}
+                                <option value="{{ timeSlot.slot }}">{{ timeSlot.slot.strftime("%I:%M %p") }}</option>
+                                {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="booking-field">
+                        <label class="booking-label">Group Size</label>
+                        <select class="booking-input" name="guestCount" required>
+                            <option value="">Select group size</option>
+                            <option value="1">1 person</option>
+                            <option value="2">2 people</option>
+                            <option value="3">3 people</option>
+                            <option value="4">4 people</option>
+                            <option value="5">5 people</option>
+                            <option value="6">6 people</option>
+                            <option value="7">7 people</option>
+                            <option value="8">8 people</option>
+                        </select>
+                    </div>
+
+                    <div class="booking-field">
+                        <label class="booking-label">Special Requests <span class="booking-optional">(optional)</span></label>
+                        <textarea class="booking-input booking-textarea" name="special_requests" placeholder="Dietary requirements, allergies, special occasions..." rows="3"></textarea>
+                    </div>
+
+                    <!-- Table availability  -->
+                    <div class="booking-avail-card">
+                        <h2 class="booking-info-title">Table Availability</h2>
+                        <p class="booking-avail-note" id="availNote">Select a date and time to check availability</p>
+
+                        <div id="availBanner" class="booking-avail-banner booking-avail-open" style="display:none;"></div>
+
+                        <div id="tableGrid" class="booking-table-grid">
+                            <!-- Initially shows all tables with today's status -->
+                            {% for table in tables %}
+                            <div class="booking-table-cell {{ 'booking-cell-occupied' if table.status == 'OCCUPIED' else 'booking-cell-available' }}"
+                                 data-table-id="{{ table.id }}" data-seats="{{ table.seats }}">
+                                <span class="booking-cell-id">T{{ table.id }}</span>
+                                <span class="booking-cell-status">{{ 'Occupied' if table.status == 'OCCUPIED' else 'AVAILABLE' }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <p class="booking-avail-hint" id="availHint" style="display:none;">Click an available table to set your seating preference</p>
+                    </div>
+
+                    <!-- Hidden input  -->
+                    <input type="hidden" id="preferredTableInput" name="preferred_table_id" value="">
+
+                    <button type="submit" class="booking-submit">Confirm Reservation</button>
+
+                </form>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="rp-footer">
+        <div class="rp-max">
+            <div class="rp-footer-inner">
+                <div>
+                    <div class="rp-footer-brand">{{ name }}</div>
+                    <p class="rp-footer-address">{{ address }}</p>
+                </div>
+                <div class="rp-footer-links">
+                    <a href="#menu" class="rp-footer-link">Menu</a>
+                    <a href="#book" class="rp-footer-link">Reserve</a>
+                    <a href="#visit" class="rp-footer-link">Visit</a>
+                    <a href="{{ url_for('loginpage') }}" class="rp-footer-link">Staff Login</a>
+                </div>
+            </div>
+            <div class="rp-footer-bottom">
+                <div class="rp-footer-bottom-inner">
+                    <span>&copy; 2026 {{ name }}. All rights reserved.</span>
+                    <span>Bookings powered by <span class="rp-powered">TableFlow</span></span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+<script>
+    var dateInput = document.getElementById('inputDate');
+    var timeSelect = document.getElementById('inputTime');
+    var availNote = document.getElementById('availNote');
+    var availBanner = document.getElementById('availBanner');
+    var tableGrid = document.getElementById('tableGrid');
+    var availHint = document.getElementById('availHint');
+    var preferredTableInput = document.getElementById('preferredTableInput');
+    var selectedTableId = null;
+
+    function renderTableCells(tables) {
+        tableGrid.innerHTML = '';
+        selectedTableId = null;
+        preferredTableInput.value = '';
+
+        tables.forEach(function(table) {
+            var isAvailable = table.status === 'AVAILABLE';
+            var cell = document.createElement('div');
+            cell.className = 'booking-table-cell ' + (isAvailable ? 'booking-cell-available booking-cell-clickable' : 'booking-cell-occupied');
+            cell.dataset.tableId = table.id;
+            cell.innerHTML =
+                '<span class="booking-cell-id">T' + table.id + '</span>' +
+                '<span class="booking-cell-seats">' + table.seats + 'p</span>' +
+                '<span class="booking-cell-status">' + (isAvailable ? 'Free' : 'Occupied') + '</span>';
+
+            if (isAvailable) {
+                cell.addEventListener('click', function() {
+                    if (selectedTableId === table.id) {
+                        cell.classList.remove('booking-cell-selected');
+                        selectedTableId = null;
+                        preferredTableInput.value = '';
+                    } else {
+                        tableGrid.querySelectorAll('.booking-cell-selected').forEach(function(el) {
+                            el.classList.remove('booking-cell-selected');
+                        });
+                        cell.classList.add('booking-cell-selected');
+                        selectedTableId = table.id;
+                        preferredTableInput.value = table.id;
+                    }
+                });
+            }
+
+            tableGrid.appendChild(cell);
+        });
+    }
+
+    function updateAvailability() {
+        var date = dateInput.value;
+        var time = timeSelect.value;
+
+        if (!date || !time) {
+            availNote.textContent = 'Select a date and time to check availability';
+            availBanner.style.display = 'none';
+            availHint.style.display = 'none';
+            return;
+        }
+
+        availNote.textContent = 'Checking...';
+        availBanner.style.display = 'none';
+        availHint.style.display = 'none';
+        tableGrid.innerHTML = '<div class="booking-avail-loading">Loading availability...</div>';
+
+        fetch('/api/availability?date=' + date + '&time=' + encodeURIComponent(time))
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var tables = data.tables;
+                var count = data.available_count;
+
+                var dateFormatted = new Date(date + 'T00:00:00').toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+                availNote.textContent = 'Availability for ' + dateFormatted;
+
+                availBanner.style.display = 'flex';
+                if (count > 0) {
+                    availBanner.className = 'booking-avail-banner booking-avail-open';
+                    availBanner.innerHTML =
+                        '<span class="booking-avail-num">' + count + '</span>' +
+                        '<span class="booking-avail-text">tables available</span>';
+                    availHint.style.display = 'block';
+                } else {
+                    availBanner.className = 'booking-avail-banner booking-avail-full';
+                    availBanner.innerHTML = '<span class="booking-avail-text">No tables available for this time</span>';
+                }
+
+                renderTableCells(tables);
+            })
+            .catch(function() {
+                availNote.textContent = 'Could not load availability';
+                tableGrid.innerHTML = '';
+            });
+    }
+
+    dateInput.addEventListener('change', updateAvailability);
+    timeSelect.addEventListener('change', updateAvailability);
+</script>
+
+</body>
+</html>

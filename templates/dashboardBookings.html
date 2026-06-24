@@ -23,6 +23,7 @@
                     <th>Date & time</th>
                     <th>Guests</th>
                     <th>Status</th>
+                    <th>Tables</th>
                     <th>Special Requests</th>
                     <th>Edit Booking</th>
                 </tr>
@@ -34,9 +35,16 @@
                     <td>{{ booking.name }}</td>
                     <td>{{ booking.phone }}</td>
                     <td>{{ booking.email }}</td>
-                    <td>{{ booking.date.strftime('%d %b %Y') }} · {{ booking.time.strftime('%I:%M %p') }}</td>
+                    <td>{{ booking.date.strftime('%d %b %Y') }} - {{ booking.time.strftime('%I:%M %p') }}</td>
                     <td>{{ booking.guestCount }}</td>
                     <td><span class="badge badge-{{ booking.status | lower }}">{{ booking.status }}</span></td>
+                    <td>
+                        {% if booking.tables %}
+                            {% for t in booking.tables %}Table {{ t.id }}{% if not loop.last %}, {% endif %}{% endfor %}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
                     <td class="td-requests" title="{{ booking.special_requests or '' }}">
                         {% if booking.special_requests %}
                             {{ booking.special_requests[:40] }}{% if booking.special_requests | length > 40 %}...{% endif %}
@@ -55,6 +63,7 @@
                             data-time="{{ booking.time.strftime('%H:%M:%S') }}"
                             data-status="{{ booking.status }}"
                             data-requests="{{ booking.special_requests or '' }}"
+                            data-table-ids="{{ booking.tables | map(attribute='id') | join(',') }}"
                             onclick="openEditModal(this)">Edit Booking</button>
                     </td>
                 </tr>
@@ -67,7 +76,7 @@
         
                 {% else %}
                 <tr>
-                    <td colspan="9" class="dash-empty">No bookings yet.</td>
+                    <td colspan="10" class="dash-empty">No bookings yet.</td>
                 </tr>
                 {% endfor %}
                
@@ -108,38 +117,7 @@
             </select>
 
             <label>Date</label>
-            <input type="hidden" id="editDate" name="date">
-            <div class="date-dropdowns">
-                <select id="editDay" class="modal-select" required>
-                    <option value="">Day</option>
-                    {% for d in range(1, 32) %}
-                    <option value="{{ d }}">{{ d }}</option>
-                    {% endfor %}
-                </select>
-                <select id="editMonth" class="modal-select" required>
-                    <option value="">Month</option>
-                    <option value="01">January</option>
-                    <option value="02">February</option>
-                    <option value="03">March</option>
-                    <option value="04">April</option>
-                    <option value="05">May</option>
-                    <option value="06">June</option>
-                    <option value="07">July</option>
-                    <option value="08">August</option>
-                    <option value="09">September</option>
-                    <option value="10">October</option>
-                    <option value="11">November</option>
-                    <option value="12">December</option>
-                </select>
-                <select id="editYear" class="modal-select" required>
-                    <option value="">Year</option>
-                    <option value="2024">2024</option>
-                    <option value="2025">2025</option>
-                    <option value="2026">2026</option>
-                    <option value="2027">2027</option>
-                    <option value="2028">2028</option>
-                </select>
-            </div>
+            <input type="date" id="editDate" name="date" class="modal-select" required>
 
             <label>Time</label>
             <select id="editTime" name="time" class="modal-select" required>
@@ -155,6 +133,18 @@
                 <option value="CANCELED">Canceled</option>
                 <option value="EXPIRED">Expired</option>
             </select>
+
+            <label>Assign Tables</label>
+            <div class="table-checkboxes">
+                {% for table in tables %}
+                <label class="table-checkbox-label">
+                    <input type="checkbox" name="table_ids" value="{{ table.id }}">
+                    Table {{ table.id }} - {{ table.seats }} seats
+                </label>
+                {% else %}
+                <p class="dash-empty">No tables available.</p>
+                {% endfor %}
+            </div>
 
             <label>Special Requests</label>
             <textarea id="editSpecialRequests" name="special_requests" class="modal-textarea"
@@ -199,38 +189,7 @@
             </select>
 
             <label>Date</label>
-            <input type="hidden" id="addDate" name="date">
-            <div class="date-dropdowns">
-                <select id="addDay" class="modal-select" required>
-                    <option value="">Day</option>
-                    {% for d in range(1, 32) %}
-                    <option value="{{ d }}">{{ d }}</option>
-                    {% endfor %}
-                </select>
-                <select id="addMonth" class="modal-select" required>
-                    <option value="">Month</option>
-                    <option value="01">January</option>
-                    <option value="02">February</option>
-                    <option value="03">March</option>
-                    <option value="04">April</option>
-                    <option value="05">May</option>
-                    <option value="06">June</option>
-                    <option value="07">July</option>
-                    <option value="08">August</option>
-                    <option value="09">September</option>
-                    <option value="10">October</option>
-                    <option value="11">November</option>
-                    <option value="12">December</option>
-                </select>
-                <select id="addYear" class="modal-select" required>
-                    <option value="">Year</option>
-                    <option value="2024">2024</option>
-                    <option value="2025">2025</option>
-                    <option value="2026">2026</option>
-                    <option value="2027">2027</option>
-                    <option value="2028">2028</option>
-                </select>
-            </div>
+            <input type="date" id="addDate" name="date" class="modal-select" required>
 
             <label>Time</label>
             <select name="time" class="modal-select" required>
@@ -239,6 +198,18 @@
                 <option value="{{ timeSlot.slot }}">{{ timeSlot.slot.strftime("%I:%M %p") }}</option>
                 {% endfor %}
             </select>
+
+            <label>Assign Tables</label>
+            <div class="table-checkboxes">
+                {% for table in tables %}
+                <label class="table-checkbox-label">
+                    <input type="checkbox" name="table_ids" value="{{ table.id }}">
+                    Table {{ table.id }} - {{ table.seats }} seats
+                </label>
+                {% else %}
+                <p class="dash-empty">No tables available.</p>
+                {% endfor %}
+            </div>
 
             <label>Special Requests</label>
             <textarea name="special_requests" class="modal-textarea"
@@ -270,14 +241,18 @@
         document.getElementById('editEmail').value = d.email;
         document.getElementById('editPhone').value = d.phone;
         document.getElementById('editGuests').value = d.guests;
-        const dateParts = d.date.split('-');
-        document.getElementById('editYear').value = dateParts[0];
-        document.getElementById('editMonth').value = dateParts[1];
-        document.getElementById('editDay').value = parseInt(dateParts[2]);
+        document.getElementById('editDate').value = d.date;
         document.getElementById('editTime').value = d.time;
         document.getElementById('editStatus').value = d.status;
         document.getElementById('editSpecialRequests').value = d.requests || '';
         document.getElementById('editBookingForm').action = '/dashboard/bookings/edit/' + d.id;
+
+        // Pre-check tables that are already assigned to this booking
+        const assignedIds = d.tableIds ? d.tableIds.split(',') : [];
+        document.querySelectorAll('#editBookingModal input[name="table_ids"]').forEach(function(cb) {
+            cb.checked = assignedIds.includes(cb.value);
+        });
+
         document.getElementById('editBookingModal').style.display = 'flex';
     }
     function closeEditModal() {
@@ -287,19 +262,6 @@
         if (e.target === this) closeEditModal();
     });
 
-    document.getElementById('editBookingForm').addEventListener('submit', function() {
-        const day = String(document.getElementById('editDay').value).padStart(2, '0');
-        const month = document.getElementById('editMonth').value;
-        const year = document.getElementById('editYear').value;
-        document.getElementById('editDate').value = year + '-' + month + '-' + day;
-    });
-
-    document.querySelector('#addBookingModal form').addEventListener('submit', function() {
-        const day = String(document.getElementById('addDay').value).padStart(2, '0');
-        const month = document.getElementById('addMonth').value;
-        const year = document.getElementById('addYear').value;
-        document.getElementById('addDate').value = year + '-' + month + '-' + day;
-    });
 </script>
 
 {% endblock %}

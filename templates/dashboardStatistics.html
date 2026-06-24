@@ -1,102 +1,155 @@
 {% extends "dashboardBase.html" %}
 
 {% block title %}Statistics{% endblock %}
-
 {% block heading %}Statistics{% endblock %}
-{% block subtitle %}Overview of booking performance{% endblock %}
+{% block subtitle %}Booking stats{% endblock %}
 
 {% block content %}
 
+<!-- date bar -->
+<div class="table-date-bar">
+    <form method="GET" action="{{ url_for('dashboardStatistics') }}" class="table-date-form">
+        <span class="table-date-label">Viewing:</span>
+        <input type="date" name="date" value="{{ ref_date.isoformat() }}"
+               class="table-date-input" onchange="this.form.submit()">
+        <input type="hidden" name="period" value="{{ period }}">
+    </form>
+    {% if not is_today %}
+    <span class="table-date-badge">{{ ref_date.strftime('%A, %d/%m/%Y') }}</span>
+    {% endif %}
+</div>
+
+<!-- tabs -->
+<div class="stat-period-tabs">
+    {% for label, val in [("Today", "today"), ("This Week", "week"), ("This Month", "month"), ("All Time", "all")] %}
+    <a href="{{ url_for('dashboardStatistics', period=val) }}"
+       class="stat-period-tab {% if period == val and not selected_date %}active{% endif %}">{{ label }}</a>
+    {% endfor %}
+    {% if selected_date %}
+    <span class="stat-period-tab active">{{ selected_date.strftime('%d/%m/%Y') }}</span>
+    {% endif %}
+</div>
+
+<!-- stat cards -->
 <section class="dash-stats">
-    <div class="stat-card">
-        <div>
-            <p class="stat-label">Total Bookings</p>
-            <p class="stat-value">{{ bookings | length }}</p>
-        </div>
+    <div class="stat-card stat-card-accent">
+        <p class="stat-label">Total Bookings</p>
+        <p class="stat-value">{{ total }}</p>
     </div>
     <div class="stat-card">
-        <div>
-            <p class="stat-label">Approved</p>
-            <p class="stat-value">{{ status_counts["APPROVED"] }}</p>
-        </div>
+        <p class="stat-label">Approval Rate</p>
+        <p class="stat-value">{{ approval_rate }}%</p>
     </div>
     <div class="stat-card">
-        <div>
-            <p class="stat-label">Pending</p>
-            <p class="stat-value">{{ status_counts["PENDING"] }}</p>
-        </div>
+        <p class="stat-label">Upcoming</p>
+        <p class="stat-value">{{ upcoming_count }}</p>
     </div>
     <div class="stat-card">
-        <div>
-            <p class="stat-label">Approved Guests</p>
-            <p class="stat-value">{{ approved_guests }}</p>
-        </div>
+        <p class="stat-label">Avg Group Size</p>
+        <p class="stat-value">{{ avg_group_size }}</p>
     </div>
 </section>
 
-<div class="dash-grid">
+<!-- breakdown  -->
+<div class="dash-grid" style="margin-top:1.25rem;">
 
     <section class="dash-card">
         <div class="dash-card-header">
             <h2>Bookings by Status</h2>
         </div>
-        <div class="bar-chart">
-            {% for label, key in [("Pending", "PENDING"), ("Approved", "APPROVED"), ("Canceled", "CANCELED"), ("Expired", "EXPIRED")] %}
-            <div class="bar-chart-col">
-                <span style="font-size:0.8rem; color:var(--color-gray-500);">{{ status_counts[key] }}</span>
-                <div class="bar" style="height: {{ ((status_counts[key] / max_status) * 120) | int if max_status > 0 else 2 }}px;"></div>
-                <small>{{ label }}</small>
-            </div>
-            {% endfor %}
-        </div>
-    </section>
-
-    <section class="dash-card">
-        <div class="dash-card-header">
-            <h2>Bookings by Month</h2>
-        </div>
-        {% if monthly %}
-        <div class="bar-chart">
-            {% for entry in monthly %}
-            <div class="bar-chart-col">
-                <span style="font-size:0.8rem; color:var(--color-gray-500);">{{ entry.count }}</span>
-                <div class="bar" style="height: {{ ((entry.count / max_monthly) * 120) | int if max_monthly > 0 else 2 }}px;"></div>
-                <small>{{ entry.label }}</small>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <p class="dash-empty">No booking data yet.</p>
-        {% endif %}
-    </section>
-
-    <section class="dash-card dash-card-wide">
-        <div class="dash-card-header">
-            <h2>Status Breakdown</h2>
-        </div>
+        {% if total > 0 %}
         <div class="table-responsive">
             <table class="dash-table">
                 <thead>
-                    <tr>
-                        <th>Status</th>
-                        <th>Count</th>
-                        <th>% of Total</th>
-                    </tr>
+                    <tr><th>Status</th><th>Count</th><th></th></tr>
                 </thead>
                 <tbody>
-                    {% set total = bookings | length %}
-                    {% for label, key in [("Pending", "PENDING"), ("Approved", "APPROVED"), ("Canceled", "CANCELED"), ("Expired", "EXPIRED")] %}
+                    {% for label, count in status_breakdown %}
                     <tr>
-                        <td><span class="badge badge-{{ key | lower }}">{{ label }}</span></td>
-                        <td>{{ status_counts[key] }}</td>
-                        <td>{{ ((status_counts[key] / total) * 100) | round(1) if total > 0 else 0 }}%</td>
+                        <td><span class="badge badge-{{ label | lower }}">{{ label }}</span></td>
+                        <td>{{ count }}</td>
+                        <td>
+                            <div class="stat-bar-track">
+                                <div class="stat-bar-fill" style="width:{{ ((count / max_status_count) * 100)|int if max_status_count > 0 else 0 }}%;"></div>
+                            </div>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+        {% else %}
+        <p class="dash-empty">No bookings for this period.</p>
+        {% endif %}
+    </section>
+
+    <section class="dash-card">
+        <div class="dash-card-header">
+            <h2>Most Popular Time Slots</h2>
+        </div>
+        {% if top_slots %}
+        <div class="table-responsive">
+            <table class="dash-table">
+                <thead>
+                    <tr><th>Time</th><th>Bookings</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for slot, count in top_slots %}
+                    <tr>
+                        <td>{{ slot }}</td>
+                        <td>{{ count }}</td>
+                        <td>
+                            <div class="stat-bar-track">
+                                <div class="stat-bar-fill" style="width:{{ ((count / max_slot_count) * 100)|int if max_slot_count > 0 else 0 }}%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="dash-empty">No bookings for this period.</p>
+        {% endif %}
     </section>
 
 </div>
+
+<!-- recent bookings list -->
+<section class="dash-card dash-card-wide" style="margin-top:1rem;">
+    <div class="dash-card-header">
+        <h2>Recent Bookings</h2>
+    </div>
+    {% if recent_bookings %}
+    <div class="table-responsive">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Guests</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in recent_bookings %}
+                <tr>
+                    <td>#{{ b.id }}</td>
+                    <td>{{ b.name }}</td>
+                    <td>{{ b.date.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ b.time.strftime('%I:%M %p') }}</td>
+                    <td>{{ b.guestCount }}</td>
+                    <td><span class="badge badge-{{ b.status | lower }}">{{ b.status }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="dash-empty">No bookings for this period.</p>
+    {% endif %}
+</section>
 
 {% endblock %}

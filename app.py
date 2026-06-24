@@ -1,13 +1,15 @@
-from flask import Flask, render_template, redirect, url_for, request, flash, session
+from flask import Flask, render_template, redirect, url_for, request, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 from flask_mail import Mail, Message
 # import os # not currently being used?
 import datetime
+import calendar as cal_module
 
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///dummy.db"
-app.config["SLQALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "your-secret-key-for-flash-messages" # I forgot what the secret key is but it is super important
 
 # Email config 
@@ -25,11 +27,21 @@ mail = Mail(app)
 #
 # Don't know how this could be used to create different tables for different restaurants. I'll figure it out
 #-------------------------------------------------------------------------------------------------------
-class Table(database.Model): 
+
+# Many-to-many relationship between bookings and tables
+booking_tables = database.Table('booking_tables',
+    database.Column('booking_id', database.Integer, database.ForeignKey('bookings.id'), primary_key=True),
+    database.Column('table_id',   database.Integer, database.ForeignKey('tables.id'),   primary_key=True)
+)
+
+class Table(database.Model):
     __tablename__ = "tables"
 
     id = database.Column(database.Integer, primary_key=True)
     seats = database.Column(database.Integer)
+
+    # AVAILABLE = free, RESERVED = has an advance booking, OCCUPIED = physically in use walk-in
+    status = database.Column(database.String(20), nullable=False, default='AVAILABLE')
 
     def __repr__(self):
         return f"{self.id}: {self.seats}"
@@ -43,14 +55,46 @@ class Booking(database.Model):
     guestCount = database.Column(database.Integer, default=1)
     phone = database.Column(database.String(32))
     email = database.Column(database.String(128))
-    # Table ID and stuff goes here. Problem is that there could be multiple tables booked and also how do I do foreign keys in SQLAlchemy.
     date = database.Column(database.Date, nullable=False)
     time = database.Column(database.Time, nullable=False)
-    status = database.Column(database.String(16), nullable=False)
+    status           = database.Column(database.String(16),  nullable=False)
+    special_requests = database.Column(database.String(512))
+    # Many-to-many relationship with Table via booking_tables 
+    tables = database.relationship('Table', secondary=booking_tables, backref='bookings')
 
     def __repr__(self): # I don't know how to set up the __repr__
         return f"{self.id}: {self.name}"
     
+class Order(database.Model):
+    __tablename__ = "orders"
+
+    id         = database.Column(database.Integer, primary_key=True)
+    table_id   = database.Column(database.Integer, database.ForeignKey('tables.id'), nullable=True)
+    status       = database.Column(database.String(20), nullable=False, default='OPEN')  # OPEN / PAID / CANCELED
+    created_at   = database.Column(database.DateTime, default=datetime.datetime.now)
+    note         = database.Column(database.String(256))
+    payment_cash = database.Column(database.Float, nullable=False, default=0.0)
+    payment_card = database.Column(database.Float, nullable=False, default=0.0)
+    table      = database.relationship('Table', backref='pos_orders')
+    items      = database.relationship('OrderItem', backref='order', cascade='all, delete-orphan')
+
+    @property
+    def total(self):
+        return sum(oi.quantity * oi.unit_price for oi in self.items)
+
+    def __repr__(self):
+        return f"Order {self.id}"
+
+class OrderItem(database.Model):
+    __tablename__ = "order_items"
+
+    id           = database.Column(database.Integer, primary_key=True)
+    order_id     = database.Column(database.Integer, database.ForeignKey('orders.id'),      nullable=False)
+    quantity     = database.Column(database.Integer, nullable=False, default=1)
+
+    def __repr__(self):
+        return f"OrderItem {self.id}"
+
 class TimeSlot(database.Model): #
     __tablename__ = "timeSlots"
 
@@ -65,12 +109,13 @@ class RestaurantSettings(database.Model): # Restaurant-level config one row only
     phone             = database.Column(database.String(32))
     email             = database.Column(database.String(128))
     description       = database.Column(database.String(512))  # shown on public booking form
-    max_party_size    = database.Column(database.Integer,      default=8)
-    max_advance_days  = database.Column(database.Integer,      default=30)
-    min_advance_hours = database.Column(database.Integer,      default=2)
-    open_time         = database.Column(database.Time,         default=datetime.time(10, 0))
-    close_time        = database.Column(database.Time,         default=datetime.time(22, 0))
-    days_open         = database.Column(database.String(7),    default="1111100") # Mon-Sun, 1=open 0=closed
+    max_party_size    = database.Column(database.Integer,default=8)
+    max_advance_days  = database.Column(database.Integer,default=30)
+    min_advance_hours = database.Column(database.Integer,default=2)
+    open_time         = database.Column(database.Time,default=datetime.time(10, 0))
+    close_time        = database.Column(database.Time,default=datetime.time(22, 0))
+    days_open         = database.Column(database.String(7),default="1111100") # Mon-Sun, 1=open 0=closed
+    auto_confirm      = database.Column(database.Boolean,default=False)# auto approve new bookings
 
 def initializeDummyDatabase(): # Crate dummy database file with dummy data in tables
     '''
@@ -105,7 +150,7 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
                 phone="2798833",
                 email="email@email.email.email",
                 date=datetime.date.today(),
-                time=datetime.datetime.now().time(),
+                time=datetime.time(12, 0),
                 status="PENDING"),
             Booking(
                 name="Jamie Jackson",
@@ -113,7 +158,7 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
                 phone="0404040",
                 email="dummy@email.email.email",
                 date=datetime.date.today(),
-                time=datetime.datetime.now().time(),
+                time=datetime.time(11, 0),
                 status="EXPIRED"),
             Booking(
                 name="Jackie Chan",
@@ -121,7 +166,7 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
                 phone="8456215",
                 email="Thebest@email.email.email",
                 date=datetime.date.today(),
-                time=datetime.datetime.now().time(),
+                time=datetime.time(13, 30),
                 status="APPROVED"),
             Booking(
                 name="Your mum",
@@ -129,7 +174,7 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
                 phone="4567892",
                 email="fatass@email.email.email",
                 date=datetime.date.today(),
-                time=datetime.datetime.now().time(),
+                time=datetime.time(18, 0),
                 status="CANCELED")
         ]
 
@@ -145,12 +190,17 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
             TimeSlot(slot = datetime.time(14,30))
         ]
     
+        # Link bookings to tables
+        dummyBookings[0].tables = [dummyTables[0]]  # Jimmy Johnson in Table 1 
+        dummyBookings[2].tables = [dummyTables[2]]  # Jackie Chan in Table 3
+
         print("INSERTING DUMMY TABLES")
         for table in dummyTables:
             database.session.add(table)
         print("INSERTING DUMMY BOOKINGS")
         for booking in dummyBookings:
             database.session.add(booking)
+            
         print("INSERTING TIME SLOTS")
         for timeSlot in dummyTimeSlots:
             database.session.add(timeSlot)
@@ -179,7 +229,7 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
 # Email helper
 #-------------------------------------------------------------------------------------------------------
 def send_booking_confirmation(booking, settings):
-    # Skip if customer has no email or SMTP is not configure
+    # Skip if customer has no email 
     if not booking.email or not app.config.get("MAIL_USERNAME"):
         return
     try:
@@ -196,8 +246,9 @@ def send_booking_confirmation(booking, settings):
             f"  Date:   {booking.date.strftime('%A, %d %B %Y')}\n"
             f"  Time:   {booking.time.strftime('%I:%M %p')}\n"
             f"  Guests: {booking.guestCount}\n"
-            f"  Status: Pending\n\n"
-            f"We will be in touch shortly to confirm your reservation.\n\n"
+            f"  Status: Pending\n"
+            + (f"  Special Requests: {booking.special_requests}\n" if booking.special_requests else "")
+            + f"\nWe will be in touch shortly to confirm your reservation.\n\n"
             + (f"Phone:   {settings.phone}\n" if settings and settings.phone else "")
             + (f"Address: {settings.address}\n" if settings and settings.address else "")
             + f"\n{restaurant_name}"
@@ -232,8 +283,21 @@ def index():
     Returns:
     render_template: template for the home page
     '''
-    return render_template('index.html')
+    restaurant_settings = RestaurantSettings.query.first()
+    return render_template('indexMain.html', restaurant_settings=restaurant_settings)
     #return redirect(url_for("dashboard"))
+
+@app.route("/demo")
+def indexDemo():
+    '''
+    Route to restaurant demo page.
+    Shows what a restaurant booking page looks like using TableFlow.
+    '''
+    timeSlots = TimeSlot.query.all()
+    tables = Table.query.all()
+    today = datetime.date.today()
+    restaurant_settings = RestaurantSettings.query.first()
+    return render_template('indexDemo.html', timeSlots=timeSlots, tables=tables, today=today, restaurant_settings=restaurant_settings)
 
 @app.route("/booking", methods=["GET", "POST"]) #NEEDS: HTML page, Code
 def booking():
@@ -265,6 +329,8 @@ def booking():
             time = datetime.datetime.strptime(request.form.get("time"), "%H:%M:%S").time()
             print(f"\tTime recieved: {time}")
 
+            cfg = RestaurantSettings.query.first()
+            booking_status = "APPROVED" if (cfg and cfg.auto_confirm) else "PENDING"
             newBooking = Booking(
                 name=name,
                 guestCount=guestCount,
@@ -272,20 +338,39 @@ def booking():
                 phone=phone,
                 date=date,
                 time=time,
-                status="Pending")
+                status=booking_status,
+                special_requests=request.form.get("special_requests", "").strip() or None)
+
+            # Assign preferred table if customer selected one
+            preferred_table_id = request.form.get("preferred_table_id")
+            if preferred_table_id:
+                table = Table.query.get(int(preferred_table_id))
+                if table:
+                    newBooking.tables.append(table)
 
             database.session.add(newBooking)
             database.session.commit()
 
             send_booking_confirmation(newBooking, RestaurantSettings.query.first())
 
+            return redirect(url_for("bookingSuccess", booking_id=newBooking.id))
+
         except Exception as e:
             print(f"ERROR! {str(e)}")
-    
+            flash("Something went wrong. Please check your details and try again.", "error")
+
     # Get all the data to display on the page
     timeSlots = TimeSlot.query.all()
+    tables = Table.query.all()
+    today = datetime.date.today()
 
-    return render_template("booking.html", timeSlots=timeSlots) #I don't know if the id will be needed but whatever.
+    return render_template("booking.html", timeSlots=timeSlots, tables=tables, today=today)
+
+
+@app.route("/booking/success/<int:booking_id>", methods=["GET"])
+def bookingSuccess(booking_id):
+    booking = Booking.query.get_or_404(booking_id)
+    return render_template("bookingSuccess.html", booking=booking)
 
 
 @app.route("/dashboard", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
@@ -303,7 +388,26 @@ def dashboard():
 
     bookings = Booking.query.all()
     tables = Table.query.all()
-    return render_template("dashboardOverview.html", bookings=bookings, tables=tables, active="overview")
+    today = datetime.date.today()
+
+    # Compute today's table statuses for the overview floor plan
+    today_bookings = Booking.query.filter_by(date=today).all()
+    reserved_ids = set()
+    for booking in today_bookings:
+        if booking.status.upper() in ("PENDING", "APPROVED"):
+            for table in booking.tables:
+                reserved_ids.add(table.id)
+
+    table_statuses = {}
+    for t in tables:
+        if t.status == 'OCCUPIED':
+            table_statuses[t.id] = 'OCCUPIED'
+        elif t.id in reserved_ids:
+            table_statuses[t.id] = 'RESERVED'
+        else:
+            table_statuses[t.id] = 'AVAILABLE'
+
+    return render_template("dashboardOverview.html", bookings=bookings, tables=tables, table_statuses=table_statuses, active="overview")
 
 
 @app.route("/dashboard/bookings", methods=["GET"])
@@ -319,7 +423,8 @@ def dashboardBookings():
     '''
     bookings = Booking.query.all()
     timeSlots = TimeSlot.query.all()
-    return render_template("dashboardBookings.html", bookings=bookings, timeSlots=timeSlots, active="bookings")
+    tables = Table.query.all()
+    return render_template("dashboardBookings.html", bookings=bookings, timeSlots=timeSlots, tables=tables, active="bookings")
 
 @app.route("/dashboard/bookings/add", methods=["POST"]) #    Create a new booking record in the database
 
@@ -341,7 +446,15 @@ def dashboardBookingsAdd(): #    New bookings are show "Pending" status by defau
             phone=phone,
             date=date,
             time=time,
-            status="Pending")
+            status="PENDING",
+            special_requests=request.form.get("special_requests", "").strip() or None)
+
+        # Assign selected tables to the booking
+        table_ids = request.form.getlist('table_ids')
+        for tid in table_ids:
+            table = Table.query.get(int(tid))
+            if table:
+                newBooking.tables.append(table)
 
         database.session.add(newBooking)
         database.session.commit()
@@ -351,6 +464,19 @@ def dashboardBookingsAdd(): #    New bookings are show "Pending" status by defau
         flash("Failed to add booking. Please check all fields.", "error")
 
     return redirect(url_for("dashboardBookings"))
+
+@app.route("/dashboard/bookings/approve/<int:id>", methods=["POST"])  # Quickly approves a pending booking by setting status to APPROVED
+def dashboardBookingsApprove(id):
+
+    try:
+        booking = Booking.query.get_or_404(id)
+        booking.status = "APPROVED"
+        database.session.commit()
+        flash("Booking approved.", "success")
+    except Exception as e:
+        print(f"ERROR! {str(e)}")
+        flash("Failed to approve booking.", "error")
+    return redirect(url_for("dashboard"))
 
 @app.route("/dashboard/bookings/edit/<int:id>", methods=["POST"])  #Updates all fields of an exist booking (name, email, phone, guest count,date, time, and status)
 
@@ -364,7 +490,17 @@ def dashboardBookingsEdit(id):
         booking.guestCount = int(request.form.get("guestCount"))
         booking.date = datetime.date.fromisoformat(request.form.get("date"))
         booking.time = datetime.datetime.strptime(request.form.get("time"), "%H:%M:%S").time()
-        booking.status = request.form.get("status")
+        booking.status           = request.form.get("status")
+        booking.special_requests = request.form.get("special_requests", "").strip() or None
+
+        # Update table assignment clear old and assign new selected tables
+        booking.tables = []
+        table_ids = request.form.getlist('table_ids')
+        for tid in table_ids:
+            table = Table.query.get(int(tid))
+            if table:
+                booking.tables.append(table)
+
         database.session.commit()
         flash("Booking updated successfully.", "success")
     except Exception as e:
@@ -385,17 +521,52 @@ def dashboardTables():
     '''
     tables = Table.query.all()
     today = datetime.date.today()
-    today_bookings = Booking.query.filter_by(date=today).all()
-    today_approved = [b for b in today_bookings if b.status.upper() == "APPROVED"]
-    today_guests = sum(b.guestCount for b in today_approved)
-    total_seats = sum(t.seats for t in tables)
+
+    # Use selected date from query param, fallback to today
+    date_str = request.args.get("date")
+    try:
+        selected_date = datetime.date.fromisoformat(date_str) if date_str else today
+    except ValueError:
+        selected_date = today
+
+    is_today = (selected_date == today)
+
+    # Get bookings for the selected date
+    date_bookings = Booking.query.filter_by(date=selected_date).all()
+
+    # Find which tables have an active booking on the selected date
+    reserved_ids = set()
+    for booking in date_bookings:
+        if booking.status.upper() in ("PENDING", "APPROVED"):
+            for table in booking.tables:
+                reserved_ids.add(table.id)
+
+    # 3 status: RESERVED, OCCUPIED, AVAILABLE
+    table_statuses = {}
+    for t in tables:
+        if is_today and t.status == 'OCCUPIED':
+            table_statuses[t.id] = 'OCCUPIED'
+        elif t.id in reserved_ids:
+            table_statuses[t.id] = 'RESERVED'
+        else:
+            table_statuses[t.id] = 'AVAILABLE'
+
+    total_seats     = sum(t.seats for t in tables)
+    available_count = sum(1 for s in table_statuses.values() if s == 'AVAILABLE')
+    reserved_count  = sum(1 for s in table_statuses.values() if s == 'RESERVED')
+    occupied_count  = sum(1 for s in table_statuses.values() if s == 'OCCUPIED')
+
     return render_template(
         "dashboardTables.html",
         tables=tables,
-        today_bookings=today_bookings,
-        today_approved_count=len(today_approved),
-        today_guests=today_guests,
+        table_statuses=table_statuses,
+        date_bookings=date_bookings,
+        selected_date=selected_date,
+        is_today=is_today,
         total_seats=total_seats,
+        available_count=available_count,
+        reserved_count=reserved_count,
+        occupied_count=occupied_count,
         active="tables"
     )
 
@@ -425,6 +596,20 @@ def dashboardTablesEdit(id):
         flash("Failed to update table.", "error")
     return redirect(url_for("dashboardTables"))
 
+@app.route("/dashboard/tables/toggle/<int:id>", methods=["POST"])  # Manually set table status (AVAILABLE / RESERVED / OCCUPIED)
+def dashboardTablesToggle(id):
+    try:
+        table = Table.query.get_or_404(id)
+        new_status = request.form.get("new_status", "AVAILABLE")
+        if new_status in ('AVAILABLE', 'RESERVED', 'OCCUPIED'):
+            table.status = new_status
+            database.session.commit()
+            flash(f"Table marked as {new_status.capitalize()}.", "success")
+    except Exception as e:
+        print(f"ERROR! {str(e)}")
+        flash("Failed to update table status.", "error")
+    return redirect(url_for("dashboardTables"))
+
 @app.route("/dashboard/tables/delete/<int:id>", methods=["POST"]) # Delete a table
 def dashboardTablesDelete(id):
 
@@ -438,38 +623,91 @@ def dashboardTablesDelete(id):
         flash("Failed to delete table.", "error")
     return redirect(url_for("dashboardTables"))
 
+
 @app.route("/dashboard/statistics", methods=["GET"])
 def dashboardStatistics():
-    bookings = Booking.query.all()
+    period = request.args.get("period", "all")
+    today = datetime.date.today()
 
-    status_counts = {"PENDING": 0, "APPROVED": 0, "CANCELED": 0, "EXPIRED": 0}
-    for b in bookings:
-        s = b.status.upper()
-        if s in status_counts:
-            status_counts[s] += 1
+    # get date from the date picker if theres one
+    date_str = request.args.get("date")
+    selected_date = None
+    if date_str:
+        try:
+            selected_date = datetime.date.fromisoformat(date_str)
+        except ValueError:
+            pass
 
-    monthly_raw = {}
-    for b in bookings:
-        key = b.date.strftime("%b %Y")
-        monthly_raw[key] = monthly_raw.get(key, 0) + 1
+    ref_date = selected_date if selected_date else today
+    is_today = (selected_date is None or selected_date == today)
 
-    monthly = [
-        {"label": k, "count": v}
-        for k, v in sorted(monthly_raw.items(), key=lambda x: datetime.datetime.strptime(x[0], "%b %Y"))
+    if selected_date:
+        date_start = selected_date
+        date_end = selected_date
+    elif period == "today":
+        date_start = today
+        date_end = today
+    elif period == "week":
+        # week starts monday i think
+        date_start = today - datetime.timedelta(days=today.weekday())
+        date_end = date_start + datetime.timedelta(days=6)
+    elif period == "month":
+        date_start = today.replace(day=1)
+        date_end = today.replace(day=cal_module.monthrange(today.year, today.month)[1])
+    else:
+        date_start = None
+        date_end = None
+
+    bookings_query = Booking.query
+    if date_start:
+        bookings_query = bookings_query.filter(Booking.date >= date_start)
+    if date_end:
+        bookings_query = bookings_query.filter(Booking.date <= date_end)
+    bookings = bookings_query.all()
+
+    total = len(bookings)
+    approved_count = sum(1 for b in bookings if b.status == 'APPROVED')
+    pending_count = sum(1 for b in bookings if b.status == 'PENDING')
+    canceled_count = sum(1 for b in bookings if b.status == 'CANCELED')
+    expired_count = sum(1 for b in bookings if b.status == 'EXPIRED')
+
+    approval_rate = round(approved_count / total * 100) if total > 0 else 0
+    upcoming_count = sum(1 for b in bookings if b.date >= today and b.status in ('APPROVED', 'PENDING'))
+    avg_group_size = round(sum(b.guestCount for b in bookings) / total, 1) if total > 0 else 0 # not sure if this should round or not
+
+    status_breakdown = [
+        ('Approved', approved_count),
+        ('Pending', pending_count),
+        ('Canceled', canceled_count),
+        ('Expired', expired_count),
     ]
+    max_status_count = max((c for _, c in status_breakdown), default=1)
 
-    approved_guests = sum(b.guestCount for b in bookings if b.status.upper() == "APPROVED")
-    max_monthly = max((m["count"] for m in monthly), default=0)
-    max_status = max(status_counts.values(), default=0)
+    slot_counts = {}
+    for b in bookings:
+        label = b.time.strftime('%I:%M %p')
+        slot_counts[label] = slot_counts.get(label, 0) + 1
+    top_slots = sorted(slot_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+    max_slot_count = top_slots[0][1] if top_slots else 1
+
+    recent_bookings = sorted(bookings, key=lambda b: b.date, reverse=True)[:10]
 
     return render_template(
         "dashboardStatistics.html",
-        bookings=bookings,
-        status_counts=status_counts,
-        monthly=monthly,
-        approved_guests=approved_guests,
-        max_monthly=max_monthly,
-        max_status=max_status,
+        period=period,
+        selected_date=selected_date,
+        ref_date=ref_date,
+        is_today=is_today,
+        total=total,
+        approved_count=approved_count,
+        approval_rate=approval_rate,
+        upcoming_count=upcoming_count,
+        avg_group_size=avg_group_size,
+        status_breakdown=status_breakdown,
+        max_status_count=max_status_count,
+        top_slots=top_slots,
+        max_slot_count=max_slot_count,
+        recent_bookings=recent_bookings,
         active="statistics"
     )
 
@@ -509,6 +747,11 @@ def loginpage():
             return redirect(url_for("dashboard"))
         flash("Invalid username or password.", "error")
     return render_template("loginpage.html")
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("loginpage"))
 
 @app.route("/updateDummyTables", methods=["POST"]) # NEEDS Data validation pass
 def dummyTablesUpdate():
@@ -565,7 +808,6 @@ def dashboardSettings():
 
             elif section == "rules":
                 settings.max_party_size    = int(request.form.get("max_party_size",    settings.max_party_size))
-                settings.max_advance_days  = int(request.form.get("max_advance_days",  settings.max_advance_days))
                 settings.min_advance_hours = int(request.form.get("min_advance_hours", settings.min_advance_hours))
 
             elif section == "hours":
@@ -575,6 +817,9 @@ def dashboardSettings():
                 for d in ["mon","tue","wed","thu","fri","sat","sun"]:
                     days += "1" if request.form.get(d) else "0"
                 settings.days_open = days
+
+            elif section == "booking_automation":
+                settings.auto_confirm = request.form.get("auto_confirm") == "1"
 
             database.session.commit()
             flash("Settings saved.", "success")
@@ -618,6 +863,50 @@ def dashboardTimeSlotDelete():
         flash("Failed to remove time slot.", "error")
     return redirect(url_for("dashboardSettings"))
 
+
+#-------------------------------------------------------------------------------------------------------
+# API returns JSON data for frontend use
+#-------------------------------------------------------------------------------------------------------
+@app.route("/api/availability")  # Retuns table availability
+def apiAvailability():
+    date_str = request.args.get("date")
+    time_str = request.args.get("time")
+
+    if not date_str or not time_str:
+        return jsonify({"error": "Missing date or time"}), 400
+
+    try:
+        date = datetime.date.fromisoformat(date_str)
+        time = datetime.time.fromisoformat(time_str)
+    except ValueError:
+        return jsonify({"error": "Invalid date or time format"}), 400
+
+    # Find all bookings at this excact date
+    occupied_bookings = Booking.query.filter(
+        Booking.date == date,
+        Booking.time == time,
+        func.upper(Booking.status).in_(["PENDING", "APPROVED"])
+    ).all()
+
+    # Collect table ID thar are occupied
+    occupied_ids = set()
+    for booking in occupied_bookings:
+        for table in booking.tables:
+            occupied_ids.add(table.id)
+
+    tables = Table.query.all()
+    result = [
+        {
+            "id": t.id,
+            "seats": t.seats,
+            "status": "OCCUPIED" if t.id in occupied_ids else "AVAILABLE"
+        }
+        for t in tables
+    ]
+
+    available_count = sum(1 for t in result if t["status"] == "AVAILABLE")
+
+    return jsonify({"tables": result, "available_count": available_count, "date": date_str, "time": time_str})
 
 #-------------------------------------------------------------------------------------------------------
 # Error Handling
