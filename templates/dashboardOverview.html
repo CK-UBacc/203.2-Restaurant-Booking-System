@@ -45,7 +45,8 @@
                 <tr>
                     <th>Customer</th>
                     <th>Phone</th>
-                    <th>Date & time</th>
+                    <th>Date</th>
+                    <th>time</th>
                     <th>Guests</th>
                     <th>Action</th>
                 </tr>
@@ -55,7 +56,8 @@
                 <tr>
                     <td>{{ booking.name }}</td>
                     <td>{{ booking.phone }}</td>
-                    <td>{{ booking.date }} - {{ booking.time }}</td>
+                    <td>{{ booking.date }}</td>
+                    <td>{{ booking.time }}</td>
                     <td>{{ booking.guestCount }}</td>
                     <td>
                         <form method="POST" action="{{ url_for('dashboardBookingsApprove', id=booking.id) }}">

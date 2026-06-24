@@ -36,7 +36,8 @@
                     <td>{{ booking.name }}</td>
                     <td>{{ booking.phone }}</td>
                     <td>{{ booking.email }}</td>
-                    <td>{{ booking.date.strftime('%d %b %Y') }} - {{ booking.time.strftime('%I:%M %p') }}</td>
+                    <td>{{ booking.date.strftime('%d %b %Y') }}</td>
+                    <td>{{ booking.time.strftime('%I:%M %p') }}</td>
                     <td>{{ booking.guestCount }}</td>
                     <td><span class="badge badge-{{ booking.status | lower }}">{{ booking.status }}</span></td>
                     <td>
