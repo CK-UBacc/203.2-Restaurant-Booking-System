@@ -5,6 +5,7 @@ from flask_mail import Mail, Message
 # import os # not currently being used?
 import datetime
 import calendar as cal_module
+from wtformsTesting import TestBookingForm
 
 app = Flask(__name__)
 
@@ -720,64 +721,6 @@ def dashboardStatistics():
         recent_bookings=recent_bookings,
         active="statistics"
     )
-
-@app.route("/dashboard/statistics", methods=["GET"])
-def dashboardStatistics():
-    bookings = Booking.query.all()
-
-    status_counts = {"PENDING": 0, "APPROVED": 0, "CANCELED": 0, "EXPIRED": 0}
-    for b in bookings:
-        s = b.status.upper()
-        if s in status_counts:
-            status_counts[s] += 1
-
-    monthly_raw = {}
-    for b in bookings:
-        key = b.date.strftime("%b %Y")
-        monthly_raw[key] = monthly_raw.get(key, 0) + 1
-
-    monthly = [
-        {"label": k, "count": v}
-        for k, v in sorted(monthly_raw.items(), key=lambda x: datetime.datetime.strptime(x[0], "%b %Y"))
-    ]
-
-    approved_guests = sum(b.guestCount for b in bookings if b.status.upper() == "APPROVED")
-    max_monthly = max((m["count"] for m in monthly), default=0)
-    max_status = max(status_counts.values(), default=0)
-
-    return render_template(
-        "dashboardStatistics.html",
-        bookings=bookings,
-        status_counts=status_counts,
-        monthly=monthly,
-        approved_guests=approved_guests,
-        max_monthly=max_monthly,
-        max_status=max_status,
-        active="statistics"
-    )
-
-
-@app.route("/dashboard/settings")
-def dashboardSettings():
-
-    if not session.get("logged_in"):
-        return redirect(url_for("loginpage"))
-
-    return render_template(
-        "dashboardSettings.html",
-        settings=None,
-        timeSlots=[],
-        active="settings"
-    )
-    
-@app.route("/dashboard/settings/timeslots/add", methods=["POST"])
-def dashboardTimeSlotAdd():
-    return redirect(url_for("dashboardSettings"))
-
-
-@app.route("/dashboard/settings/timeslots/delete", methods=["POST"])
-def dashboardTimeSlotDelete():
-    return redirect(url_for("dashboardSettings"))
 
 @app.route("/dummyData", methods=["GET"])
 def dummyData():
