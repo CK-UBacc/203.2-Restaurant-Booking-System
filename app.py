@@ -296,6 +296,19 @@ def dashboardStatistics():
         active="statistics"
     )
 
+
+@app.route("/dashboard/settings")
+def dashboardSettings():
+
+    if not session.get("logged_in"):
+        return redirect(url_for("loginpage"))
+
+    return render_template(
+        "dashboardSettings.html",
+        settings={},
+        active="settings"
+    )
+
 @app.route("/dummyData", methods=["GET"])
 def dummyData():
     '''
