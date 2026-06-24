@@ -305,9 +305,11 @@ def dashboardSettings():
 
     return render_template(
         "dashboardSettings.html",
-        settings={},
+        settings=None,
+        timeSlots=[],
         active="settings"
     )
+    
 
 @app.route("/dummyData", methods=["GET"])
 def dummyData():
