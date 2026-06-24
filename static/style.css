@@ -1259,7 +1259,7 @@ body.login-page {
     background-color: var(--color-white);
     border-radius: var(--radius);
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
-    padding: 2.5rem 2rem;
+    padding: 0.5rem 2rem 2rem 2rem;
     width: 100%;
     max-width: 380px;
 }
@@ -3230,4 +3230,10 @@ body.rp-page a {
     color: #fff;
     font-family: 'Instrument Serif', Georgia, serif;
     font-size: 12px;
+}
+.logo.logo {
+    width: 250px; 
+    height: auto;
+    display: block;
+    margin: 0 auto 5px auto;
 }

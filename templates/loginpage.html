@@ -12,6 +12,8 @@
         <div class="login-brand">TableFlow</div>
         <h1 class="login-title">Welcome back</h1>
         <p class="login-subtitle">Sign in to your admin dashboard</p>
+        <img src="{{ url_for('static', filename='tableflowlogo.png') }}" class="logo">
+    
 
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -48,9 +50,16 @@
                 >
             </div>
 
+            <div class="rememberme-container">
+                <input type="checkbox" id="rememberme" name="remember_me">
+                <label for="rememberme">Remember me</label>
+            </div>
+
             <button type="submit" class="login-btn">Sign in</button>
+
+           
         </form>
     </div>
-
+    
 </body>
 </html>
