@@ -32,21 +32,21 @@
 
 <!-- stat cards -->
 <section class="dash-stats">
+    <div class="stat-card">
+        <p class="stat-label">Today</p>
+        <p class="stat-value">{{ today_count }}</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">This Week</p>
+        <p class="stat-value">{{ week_count }}</p>
+    </div>
+    <div class="stat-card">
+        <p class="stat-label">This Month</p>
+        <p class="stat-value">{{ month_count }}</p>
+    </div>
     <div class="stat-card stat-card-accent">
-        <p class="stat-label">Total Bookings</p>
-        <p class="stat-value">{{ total }}</p>
-    </div>
-    <div class="stat-card">
-        <p class="stat-label">Approval Rate</p>
-        <p class="stat-value">{{ approval_rate }}%</p>
-    </div>
-    <div class="stat-card">
-        <p class="stat-label">Upcoming</p>
-        <p class="stat-value">{{ upcoming_count }}</p>
-    </div>
-    <div class="stat-card">
-        <p class="stat-label">Avg Group Size</p>
-        <p class="stat-value">{{ avg_group_size }}</p>
+        <p class="stat-label">All Time</p>
+        <p class="stat-value">{{ all_count }}</p>
     </div>
 </section>
 

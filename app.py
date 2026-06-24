@@ -712,6 +712,20 @@ def dashboardStatistics():
         date_start = None
         date_end = None
 
+    all_bookings = Booking.query.all()
+
+    # Compute fixed period counts for stat cards
+    week_start = today - datetime.timedelta(days=today.weekday())
+    week_end   = week_start + datetime.timedelta(days=6)
+    month_start = today.replace(day=1)
+    month_end   = today.replace(day=cal_module.monthrange(today.year, today.month)[1])
+
+    today_count = sum(1 for b in all_bookings if b.date == today)
+    week_count  = sum(1 for b in all_bookings if week_start <= b.date <= week_end)
+    month_count = sum(1 for b in all_bookings if month_start <= b.date <= month_end)
+    all_count   = len(all_bookings)
+
+    # Filter bookings for the detailed breakdown section
     bookings_query = Booking.query
     if date_start:
         bookings_query = bookings_query.filter(Booking.date >= date_start)
@@ -752,6 +766,10 @@ def dashboardStatistics():
         selected_date=selected_date,
         ref_date=ref_date,
         is_today=is_today,
+        today_count=today_count,
+        week_count=week_count,
+        month_count=month_count,
+        all_count=all_count,
         total=total,
         approved_count=approved_count,
         approval_rate=approval_rate,
