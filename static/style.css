@@ -2155,6 +2155,9 @@ body.error-page {
     font-weight: 500;
 }
 
+.im-nav-links a { color: #6b6258; text-decoration: none; transition: color 0.15s; }
+.im-nav-links a:hover { color: #221d17; }
+
 .im-nav-cta { display: flex; align-items: center; gap: 14px; }
 
 .im-login { font-size: 15px; font-weight: 600; color: #221d17; }
