@@ -1416,23 +1416,6 @@ body.login-page {
     text-align: center;
 }
 
-/* Reserved state has an advance booking */
-.floor-box-reserved {
-    background-color: var(--color-gray-200);
-    border-color: var(--color-gray-500);
-}
-
-.floor-box-reserved .floor-box-circle {
-    background-color: var(--color-gray-300);
-    border-color: var(--color-gray-500);
-    color: var(--color-black);
-}
-
-.floor-box-reserved .floor-box-seats,
-.floor-box-reserved .floor-box-status {
-    color: var(--color-gray-500);
-}
-
 /* Occupied state physically in use walk-in */
 .floor-box-occupied {
     background-color: var(--color-black);
@@ -1489,7 +1472,6 @@ body.login-page {
 }
 
 .legend-available { background-color: var(--color-white); }
-.legend-reserved  { background-color: var(--color-gray-300); border-color: var(--color-gray-500); }
 .legend-occupied  { background-color: var(--color-black); }
 
 /* ---------------------------------------------------------------------

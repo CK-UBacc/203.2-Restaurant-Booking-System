@@ -20,7 +20,6 @@
             <a href="{{ url_for('dashboardBookings') }}"   class="dash-nav-link {{ 'active' if active == 'bookings'  else '' }}">Manage Bookings</a>
             <a href="{{ url_for('dashboardTables') }}"     class="dash-nav-link {{ 'active' if active == 'tables'    else '' }}">Manage Tables</a>
             <a href="{{ url_for('dashboardStatistics') }}" class="dash-nav-link {{ 'active' if active == 'statistics' else '' }}">Statistics</a>
-            <a href="{{ url_for('dashboardSettings') }}"   class="dash-nav-link {{ 'active' if active == 'settings'  else '' }}">Settings</a>
         </nav>
 
         <div class="dash-sidebar-footer">
@@ -36,7 +35,7 @@
                 <h1>{% block heading %}Dashboard{% endblock %}</h1>
                 <p class="dash-subtitle">{% block subtitle %}{% endblock %}</p>
             </div>
-            <a href="{{ url_for('dashboardSettings') }}" class="dash-user">
+            <a href="{{ url_for('dashboardTables') }}" class="dash-user">
                 <div class="dash-avatar">A</div>
                 <div>
                     <strong>Admin</strong>
