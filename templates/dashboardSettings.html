@@ -1,0 +1,154 @@
+{% extends "dashboardBase.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block heading %}Settings{% endblock %}
+{% block subtitle %}Manage restaurant profile, booking rules, and time slots{% endblock %}
+
+{% block content %}
+
+{% set d = settings.days_open or '1111100' %}
+
+<!-- Row 1: Restaurant info + Booking rule -->
+<div class="dash-grid">
+
+    <!-- Restaurant Info -->
+    <section class="dash-card">
+        <div class="dash-card-header">
+            <h2>Restaurant Info</h2>
+        </div>
+        <form method="POST" action="{{ url_for('dashboardSettings') }}" class="dash-form settings-form">
+            <input type="hidden" name="section" value="info">
+
+            <label>Restaurant Name</label>
+            <input type="text" name="restaurant_name"
+                value="{{ settings.restaurant_name or '' }}" placeholder="My Restaurant" required>
+
+            <label>Address</label>
+            <input type="text" name="address"
+                value="{{ settings.address or '' }}" placeholder="123 Main Street">
+
+            <label>Phone</label>
+            <input type="tel" name="phone"
+                value="{{ settings.phone or '' }}" placeholder="04 0000 0000">
+
+            <label>Email</label>
+            <input type="email" name="email"
+                value="{{ settings.email or '' }}" placeholder="hello@restaurant.com">
+
+            <label>Welcome Message <span class="label-hint">(shown on booking form)</span></label>
+            <textarea name="description" class="modal-textarea" rows="3"
+                placeholder="Welcome! We look forward to having you.">{{ settings.description or '' }}</textarea>
+
+            <div class="settings-actions">
+                <button type="submit" class="btn btn-primary">Save Info</button>
+            </div>
+        </form>
+    </section>
+
+    <!-- Booking Rules -->
+    <section class="dash-card">
+        <div class="dash-card-header">
+            <h2>Booking Rules</h2>
+        </div>
+        <form method="POST" action="{{ url_for('dashboardSettings') }}" class="dash-form settings-form">
+            <input type="hidden" name="section" value="rules">
+
+            <label>Max Party Size</label>
+            <div class="settings-input-row">
+                <input type="number" name="max_party_size"
+                    value="{{ settings.max_party_size or 8 }}" min="1" max="50" required>
+                <span class="input-unit">guests</span>
+            </div>
+
+            <label>Min Advance Notice</label>
+            <div class="settings-input-row">
+                <input type="number" name="min_advance_hours"
+                    value="{{ settings.min_advance_hours or 2 }}" min="0" max="72" required>
+                <span class="input-unit">hours before</span>
+            </div>
+
+            <div class="settings-rule-hint">
+                Guests must book at least <strong>{{ settings.min_advance_hours or 2 }}h</strong> in advance.
+                Max group size: <strong>{{ settings.max_party_size or 8 }}</strong>.
+            </div>
+
+            <div class="settings-actions">
+                <button type="submit" class="btn btn-primary">Save Rules</button>
+            </div>
+        </form>
+    </section>
+
+</div>
+
+<!-- Row 2: Operating hours + Time slot -->
+<div class="dash-grid">
+
+    <!-- Operating Hours -->
+    <section class="dash-card">
+        <div class="dash-card-header">
+            <h2>Operating Hours</h2>
+        </div>
+        <form method="POST" action="{{ url_for('dashboardSettings') }}" class="dash-form settings-form">
+            <input type="hidden" name="section" value="hours">
+
+            <label>Opening Time</label>
+            <input type="time" name="open_time"
+                value="{{ settings.open_time.strftime('%H:%M') if settings.open_time else '10:00' }}" required>
+
+            <label>Closing Time</label>
+            <input type="time" name="close_time"
+                value="{{ settings.close_time.strftime('%H:%M') if settings.close_time else '22:00' }}" required>
+
+            <label>Days Open</label>
+            <div class="days-picker">
+                {% for label, key, idx in [('Mon','mon',0),('Tue','tue',1),('Wed','wed',2),('Thu','thu',3),('Fri','fri',4),('Sat','sat',5),('Sun','sun',6)] %}
+                <label class="day-checkbox">
+                    <input type="checkbox" name="{{ key }}"
+                        {% if d[idx] == '1' %}checked{% endif %}>
+                    <span>{{ label }}</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <div class="settings-actions">
+                <button type="submit" class="btn btn-primary">Save Hours</button>
+            </div>
+        </form>
+    </section>
+
+    <!-- Time Slots -->
+    <section class="dash-card">
+        <div class="dash-card-header">
+            <h2>Time Slots</h2>
+        </div>
+
+        <!-- Current slots -->
+        <div class="timeslot-grid">
+            {% for ts in timeSlots %}
+            <div class="timeslot-item">
+                <span>{{ ts.slot.strftime("%I:%M %p") }}</span>
+                <form method="POST" action="{{ url_for('dashboardTimeSlotDelete') }}">
+                    <input type="hidden" name="slot" value="{{ ts.slot.strftime('%H:%M:%S') }}">
+                    <button type="submit" class="btn-icon" title="Remove">✕</button>
+                </form>
+            </div>
+            {% else %}
+            <p class="dash-empty">No time slots yet.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Add new slot -->
+        <form method="POST" action="{{ url_for('dashboardTimeSlotAdd') }}"
+            class="dash-form" style="max-width:100%; margin-top:1rem;">
+            <label>Add Time Slot</label>
+            <div class="settings-input-row">
+                <input type="time" name="slot" required>
+                <button type="submit" class="btn btn-primary">Add</button>
+            </div>
+        </form>
+    </section>
+
+</div>
+
+{% endblock %}
