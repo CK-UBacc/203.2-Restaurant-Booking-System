@@ -310,6 +310,14 @@ def dashboardSettings():
         active="settings"
     )
     
+@app.route("/dashboard/settings/timeslots/add", methods=["POST"])
+def dashboardTimeSlotAdd():
+    return redirect(url_for("dashboardSettings"))
+
+
+@app.route("/dashboard/settings/timeslots/delete", methods=["POST"])
+def dashboardTimeSlotDelete():
+    return redirect(url_for("dashboardSettings"))
 
 @app.route("/dummyData", methods=["GET"])
 def dummyData():
