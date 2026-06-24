@@ -2,11 +2,9 @@ from flask import Flask, render_template, redirect, url_for, request, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from flask_mail import Mail, Message
-from wtformsTesting import TestBookingForm
 # import os # not currently being used?
 import datetime
 import calendar as cal_module
-# from wtformsTesting import TestBookingForm
 
 app = Flask(__name__)
 
@@ -517,7 +515,7 @@ def dashboardBookingsEdit(id):
         flash("Failed to update booking.", "error")
     return redirect(url_for("dashboardBookings"))
 
-@app.route("/dashboard/tables", methods=["GET", "POST"])
+@app.route("/dashboard/restaurant-info", methods=["GET", "POST"])
 def dashboardTables():
 
     if not session.get("logged_in"):

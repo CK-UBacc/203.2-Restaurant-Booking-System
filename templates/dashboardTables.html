@@ -14,10 +14,6 @@
     <div class="dash-card-header" style="padding:1.25rem 1.5rem;">
         <h2>Table Floor Plan</h2>
         <div class="dash-card-header-right">
-            <div class="floor-legend">
-                <span class="legend-dot legend-available"></span><span>Available</span>
-                <span class="legend-dot legend-occupied"></span><span>Occupied</span>
-            </div>
             <button type="button" class="btn btn-primary" onclick="openAddTableModal()">+ Add Table</button>
         </div>
     </div>
@@ -33,11 +29,6 @@
                  onclick="openEditTableModal(this)">
                 <div class="floor-box-circle">{{ table.id }}</div>
                 <div class="floor-box-seats">{{ table.seats }} seats</div>
-                <div class="floor-box-status">
-                    {% if table_statuses[table.id] == 'OCCUPIED' %}Occupied
-                    {% elif table_statuses[table.id] == 'RESERVED' %}Reserved
-                    {% else %}Available{% endif %}
-                </div>
             </div>
             {% endfor %}
 
@@ -309,13 +300,14 @@
 
         /* Status label */
         var labelEl = document.getElementById('editTableStatusLabel');
-        if (status === 'OCCUPIED') {
+        // Table occupation status is not used so it has been removed
+        /*if (status === 'OCCUPIED') {
             labelEl.innerHTML = 'Status: <span class="badge badge-expired">Occupied</span>';
         } else if (status === 'RESERVED') {
             labelEl.innerHTML = 'Status: <span class="badge badge-pending">Reserved</span>';
         } else {
             labelEl.innerHTML = 'Status: <span class="badge badge-approved">Available</span>';
-        }
+        }*/
 
         document.getElementById('editTableModal').style.display = 'flex';
     }
