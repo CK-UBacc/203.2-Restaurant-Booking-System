@@ -79,7 +79,6 @@
         <div class="dash-card-header-right">
             <div class="floor-legend">
                 <span class="legend-dot legend-available"></span><span>Available</span>
-                <span class="legend-dot legend-reserved"></span><span>Reserved</span>
                 <span class="legend-dot legend-occupied"></span><span>Occupied</span>
             </div>
             <a href="{{ url_for('dashboardTables') }}" class="btn">Manage tables</a>
@@ -88,7 +87,7 @@
     <div class="floor-room">
         <div class="floor-grid">
             {% for table in tables %}
-            <div class="floor-box {% if table_statuses[table.id] == 'OCCUPIED' %}floor-box-occupied{% elif table_statuses[table.id] == 'RESERVED' %}floor-box-reserved{% endif %}"
+            <div class="floor-box {% if table_statuses[table.id] == 'OCCUPIED' %}floor-box-occupied{% endif %}"
                  style="cursor:default;">
                 <div class="floor-box-circle">{{ table.id }}</div>
                 <div class="floor-box-seats">{{ table.seats }} seats</div>

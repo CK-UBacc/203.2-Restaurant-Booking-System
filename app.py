@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from flask_mail import Mail, Message
+from wtformsTesting import TestBookingForm
 # import os # not currently being used?
 import datetime
 import calendar as cal_module
@@ -515,13 +516,14 @@ def dashboardBookingsEdit(id):
         flash("Failed to update booking.", "error")
     return redirect(url_for("dashboardBookings"))
 
-@app.route("/dashboard/tables", methods=["GET"])
+@app.route("/dashboard/tables", methods=["GET", "POST"])
 def dashboardTables():
 
     if not session.get("logged_in"):
         return redirect(url_for("loginpage"))
     '''
     Route to the manage tables page of the dashboard.
+    Also handles settings POST requests (merged from dashboardSettings).
 
     Args:
     None
@@ -529,6 +531,45 @@ def dashboardTables():
     Returns:
     render_template: template for the manage tables page with all tables.
     '''
+    settings = RestaurantSettings.query.first()
+    if not settings:
+        settings = RestaurantSettings()
+        database.session.add(settings)
+        database.session.commit()
+
+    if request.method == "POST":
+        section = request.form.get("section", "")
+        try:
+            if section == "info":
+                settings.restaurant_name = request.form.get("restaurant_name", "").strip() or settings.restaurant_name
+                settings.address         = request.form.get("address",   "").strip() or None
+                settings.phone           = request.form.get("phone",     "").strip() or None
+                settings.email           = request.form.get("email",     "").strip() or None
+                settings.description     = request.form.get("description","").strip() or None
+
+            elif section == "rules":
+                settings.max_party_size    = int(request.form.get("max_party_size",    settings.max_party_size))
+                settings.min_advance_hours = int(request.form.get("min_advance_hours", settings.min_advance_hours))
+
+            elif section == "hours":
+                settings.open_time  = datetime.time.fromisoformat(request.form.get("open_time",  "10:00"))
+                settings.close_time = datetime.time.fromisoformat(request.form.get("close_time", "22:00"))
+                days = ""
+                for d in ["mon","tue","wed","thu","fri","sat","sun"]:
+                    days += "1" if request.form.get(d) else "0"
+                settings.days_open = days
+
+            elif section == "booking_automation":
+                settings.auto_confirm = request.form.get("auto_confirm") == "1"
+
+            database.session.commit()
+            flash("Settings saved.", "success")
+        except Exception as e:
+            print(f"ERROR! {str(e)}")
+            flash("Failed to save settings.", "error")
+
+        return redirect(url_for("dashboardTables"))
+
     tables = Table.query.all()
     today = datetime.date.today()
 
@@ -566,6 +607,8 @@ def dashboardTables():
     reserved_count  = sum(1 for s in table_statuses.values() if s == 'RESERVED')
     occupied_count  = sum(1 for s in table_statuses.values() if s == 'OCCUPIED')
 
+    timeSlots = TimeSlot.query.order_by(TimeSlot.slot).all()
+
     return render_template(
         "dashboardTables.html",
         tables=tables,
@@ -577,6 +620,8 @@ def dashboardTables():
         available_count=available_count,
         reserved_count=reserved_count,
         occupied_count=occupied_count,
+        settings=settings,
+        timeSlots=timeSlots,
         active="tables"
     )
 
@@ -721,63 +766,6 @@ def dashboardStatistics():
         active="statistics"
     )
 
-@app.route("/dashboard/statistics", methods=["GET"])
-def dashboardStatistics():
-    bookings = Booking.query.all()
-
-    status_counts = {"PENDING": 0, "APPROVED": 0, "CANCELED": 0, "EXPIRED": 0}
-    for b in bookings:
-        s = b.status.upper()
-        if s in status_counts:
-            status_counts[s] += 1
-
-    monthly_raw = {}
-    for b in bookings:
-        key = b.date.strftime("%b %Y")
-        monthly_raw[key] = monthly_raw.get(key, 0) + 1
-
-    monthly = [
-        {"label": k, "count": v}
-        for k, v in sorted(monthly_raw.items(), key=lambda x: datetime.datetime.strptime(x[0], "%b %Y"))
-    ]
-
-    approved_guests = sum(b.guestCount for b in bookings if b.status.upper() == "APPROVED")
-    max_monthly = max((m["count"] for m in monthly), default=0)
-    max_status = max(status_counts.values(), default=0)
-
-    return render_template(
-        "dashboardStatistics.html",
-        bookings=bookings,
-        status_counts=status_counts,
-        monthly=monthly,
-        approved_guests=approved_guests,
-        max_monthly=max_monthly,
-        max_status=max_status,
-        active="statistics"
-    )
-
-
-@app.route("/dashboard/settings")
-def dashboardSettings():
-
-    if not session.get("logged_in"):
-        return redirect(url_for("loginpage"))
-
-    return render_template(
-        "dashboardSettings.html",
-        settings=None,
-        timeSlots=[],
-        active="settings"
-    )
-    
-@app.route("/dashboard/settings/timeslots/add", methods=["POST"])
-def dashboardTimeSlotAdd():
-    return redirect(url_for("dashboardSettings"))
-
-
-@app.route("/dashboard/settings/timeslots/delete", methods=["POST"])
-def dashboardTimeSlotDelete():
-    return redirect(url_for("dashboardSettings"))
 
 @app.route("/dummyData", methods=["GET"])
 def dummyData():
@@ -870,45 +858,8 @@ def dummyTablesUpdate():
 #-------------------------------------------------------------------------------------------------------
 @app.route("/dashboard/settings", methods=["GET", "POST"])
 def dashboardSettings():
-    settings = RestaurantSettings.query.first()
-    if not settings: # create default row if missing
-        settings = RestaurantSettings()
-        database.session.add(settings)
-        database.session.commit()
-
-    if request.method == "POST":
-        section = request.form.get("section", "")
-        try:
-            if section == "info":
-                settings.restaurant_name = request.form.get("restaurant_name", "").strip() or settings.restaurant_name
-                settings.address         = request.form.get("address",   "").strip() or None
-                settings.phone           = request.form.get("phone",     "").strip() or None
-                settings.email           = request.form.get("email",     "").strip() or None
-                settings.description     = request.form.get("description","").strip() or None
-
-            elif section == "rules":
-                settings.max_party_size    = int(request.form.get("max_party_size",    settings.max_party_size))
-                settings.min_advance_hours = int(request.form.get("min_advance_hours", settings.min_advance_hours))
-
-            elif section == "hours":
-                settings.open_time  = datetime.time.fromisoformat(request.form.get("open_time",  "10:00"))
-                settings.close_time = datetime.time.fromisoformat(request.form.get("close_time", "22:00"))
-                days = ""
-                for d in ["mon","tue","wed","thu","fri","sat","sun"]:
-                    days += "1" if request.form.get(d) else "0"
-                settings.days_open = days
-
-            elif section == "booking_automation":
-                settings.auto_confirm = request.form.get("auto_confirm") == "1"
-
-            database.session.commit()
-            flash("Settings saved.", "success")
-        except Exception as e:
-            print(f"ERROR! {str(e)}")
-            flash("Failed to save settings.", "error")
-
-    timeSlots = TimeSlot.query.order_by(TimeSlot.slot).all()
-    return render_template("dashboardSettings.html", settings=settings, timeSlots=timeSlots, active="settings")
+    # Settings page merged into Manage Tables
+    return redirect(url_for("dashboardTables"))
 
 
 @app.route("/dashboard/settings/timeslots/add", methods=["POST"])
@@ -925,7 +876,7 @@ def dashboardTimeSlotAdd():
     except Exception as e:
         print(f"ERROR! {str(e)}")
         flash("Invalid time format.", "error")
-    return redirect(url_for("dashboardSettings"))
+    return redirect(url_for("dashboardTables"))
 
 
 @app.route("/dashboard/settings/timeslots/delete", methods=["POST"])
@@ -941,7 +892,7 @@ def dashboardTimeSlotDelete():
     except Exception as e:
         print(f"ERROR! {str(e)}")
         flash("Failed to remove time slot.", "error")
-    return redirect(url_for("dashboardSettings"))
+    return redirect(url_for("dashboardTables"))
 
 
 #-------------------------------------------------------------------------------------------------------
