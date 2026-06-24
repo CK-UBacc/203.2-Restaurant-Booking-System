@@ -2151,9 +2151,12 @@ body.error-page {
     align-items: center;
     gap: 34px;
     font-size: 15px;
-    color: #6b6258;
+    color: #888888;
     font-weight: 500;
 }
+
+.im-nav-links a { color: #888888; text-decoration: none; transition: color 0.15s; }
+.im-nav-links a:hover { color: #111111; }
 
 .im-nav-cta { display: flex; align-items: center; gap: 14px; }
 
