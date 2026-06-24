@@ -2131,7 +2131,7 @@ body.error-page {
 
 .im-page ::selection { background: #f0c9b8; }
 
-.im-page a { text-decoration: none; color: inherit; }
+.im-page a { text-decoration: none; }
 
 .im-page details > summary { list-style: none; cursor: pointer; }
 .im-page details > summary::-webkit-details-marker { display: none; }
