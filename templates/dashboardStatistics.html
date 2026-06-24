@@ -1,0 +1,102 @@
+{% extends "dashboardBase.html" %}
+
+{% block title %}Statistics{% endblock %}
+
+{% block heading %}Statistics{% endblock %}
+{% block subtitle %}Overview of booking performance{% endblock %}
+
+{% block content %}
+
+<section class="dash-stats">
+    <div class="stat-card">
+        <div>
+            <p class="stat-label">Total Bookings</p>
+            <p class="stat-value">{{ bookings | length }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div>
+            <p class="stat-label">Approved</p>
+            <p class="stat-value">{{ status_counts["APPROVED"] }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div>
+            <p class="stat-label">Pending</p>
+            <p class="stat-value">{{ status_counts["PENDING"] }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div>
+            <p class="stat-label">Approved Guests</p>
+            <p class="stat-value">{{ approved_guests }}</p>
+        </div>
+    </div>
+</section>
+
+<div class="dash-grid">
+
+    <section class="dash-card">
+        <div class="dash-card-header">
+            <h2>Bookings by Status</h2>
+        </div>
+        <div class="bar-chart">
+            {% for label, key in [("Pending", "PENDING"), ("Approved", "APPROVED"), ("Canceled", "CANCELED"), ("Expired", "EXPIRED")] %}
+            <div class="bar-chart-col">
+                <span style="font-size:0.8rem; color:var(--color-gray-500);">{{ status_counts[key] }}</span>
+                <div class="bar" style="height: {{ ((status_counts[key] / max_status) * 120) | int if max_status > 0 else 2 }}px;"></div>
+                <small>{{ label }}</small>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="dash-card">
+        <div class="dash-card-header">
+            <h2>Bookings by Month</h2>
+        </div>
+        {% if monthly %}
+        <div class="bar-chart">
+            {% for entry in monthly %}
+            <div class="bar-chart-col">
+                <span style="font-size:0.8rem; color:var(--color-gray-500);">{{ entry.count }}</span>
+                <div class="bar" style="height: {{ ((entry.count / max_monthly) * 120) | int if max_monthly > 0 else 2 }}px;"></div>
+                <small>{{ entry.label }}</small>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="dash-empty">No booking data yet.</p>
+        {% endif %}
+    </section>
+
+    <section class="dash-card dash-card-wide">
+        <div class="dash-card-header">
+            <h2>Status Breakdown</h2>
+        </div>
+        <div class="table-responsive">
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Count</th>
+                        <th>% of Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set total = bookings | length %}
+                    {% for label, key in [("Pending", "PENDING"), ("Approved", "APPROVED"), ("Canceled", "CANCELED"), ("Expired", "EXPIRED")] %}
+                    <tr>
+                        <td><span class="badge badge-{{ key | lower }}">{{ label }}</span></td>
+                        <td>{{ status_counts[key] }}</td>
+                        <td>{{ ((status_counts[key] / total) * 100) | round(1) if total > 0 else 0 }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+
+{% endblock %}

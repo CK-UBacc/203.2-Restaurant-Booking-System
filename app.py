@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, session
 from flask_sqlalchemy import SQLAlchemy
 # import os # not currently being used?
 import datetime
@@ -10,6 +10,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///dummy.db"
 app.config["SLQALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "your-secret-key-for-flash-messages" # I forgot what the secret key is but it is super important
 
+from datetime import timedelta #Sets remember me time duration to 30 days
+app.permanent_session_lifetime = timedelta(days=30) #Tells flask how long a single session can be live for
 database = SQLAlchemy(app)
 
 #-------------------------------------------------------------------------------------------------------
@@ -208,6 +210,9 @@ def booking():
 
 @app.route("/dashboard", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
 def dashboard():
+
+    if not session.get("logged_in"):
+        return redirect(url_for("loginpage"))
     '''
     Route to dashboard
     Dashboard is supposed to display the restaurants data and act as the hub page for a restaurant manager
@@ -223,8 +228,12 @@ def dashboard():
     tables = Table.query.all()
     return render_template("dashboardOverview.html", bookings=bookings, tables=tables, active="overview")
 
+
 @app.route("/dashboard/bookings", methods=["GET"])
 def dashboardBookings():
+
+    if not session.get("logged_in"):
+        return redirect(url_for("loginpage"))
     '''
     Route to the manage bookings page of the dashboard.
 
@@ -239,6 +248,9 @@ def dashboardBookings():
 
 @app.route("/dashboard/tables", methods=["GET"])
 def dashboardTables():
+
+    if not session.get("logged_in"):
+        return redirect(url_for("loginpage"))
     '''
     Route to the manage tables page of the dashboard.
 
@@ -250,6 +262,64 @@ def dashboardTables():
     '''
     tables = Table.query.all()
     return render_template("dashboardTables.html", tables=tables, active="tables")
+
+@app.route("/dashboard/statistics", methods=["GET"])
+def dashboardStatistics():
+    bookings = Booking.query.all()
+
+    status_counts = {"PENDING": 0, "APPROVED": 0, "CANCELED": 0, "EXPIRED": 0}
+    for b in bookings:
+        s = b.status.upper()
+        if s in status_counts:
+            status_counts[s] += 1
+
+    monthly_raw = {}
+    for b in bookings:
+        key = b.date.strftime("%b %Y")
+        monthly_raw[key] = monthly_raw.get(key, 0) + 1
+
+    monthly = [
+        {"label": k, "count": v}
+        for k, v in sorted(monthly_raw.items(), key=lambda x: datetime.datetime.strptime(x[0], "%b %Y"))
+    ]
+
+    approved_guests = sum(b.guestCount for b in bookings if b.status.upper() == "APPROVED")
+    max_monthly = max((m["count"] for m in monthly), default=0)
+    max_status = max(status_counts.values(), default=0)
+
+    return render_template(
+        "dashboardStatistics.html",
+        bookings=bookings,
+        status_counts=status_counts,
+        monthly=monthly,
+        approved_guests=approved_guests,
+        max_monthly=max_monthly,
+        max_status=max_status,
+        active="statistics"
+    )
+
+
+@app.route("/dashboard/settings")
+def dashboardSettings():
+
+    if not session.get("logged_in"):
+        return redirect(url_for("loginpage"))
+
+    return render_template(
+        "dashboardSettings.html",
+        settings=None,
+        timeSlots=[],
+        active="settings"
+    )
+    
+@app.route("/dashboard/settings/timeslots/add", methods=["POST"])
+def dashboardTimeSlotAdd():
+    return redirect(url_for("dashboardSettings"))
+
+
+@app.route("/dashboard/settings/timeslots/delete", methods=["POST"])
+def dashboardTimeSlotDelete():
+    return redirect(url_for("dashboardSettings"))
 
 @app.route("/dummyData", methods=["GET"])
 def dummyData():
@@ -274,6 +344,36 @@ def dummyData():
                            timeSlots=timeSlots,
                            testBooking=testBooking
                            )
+
+@app.route("/loginpage", methods=["GET","POST"])
+def loginpage():
+    if request.method == "POST":
+
+        username = request.form.get("AdminUsername")
+        password = request.form.get("Adminpassword")
+
+        remember_me = request.form.get("remember_me") == "on"
+
+        if username == "admin123" and password == "admin123":
+            session["logged_in"] = True
+            session["username"] = username
+
+            session.permanent = remember_me
+
+            return redirect(url_for("dashboard"))
+        
+        return render_template("loginpage.html",
+                               error="Incorrect Username Or Password"
+            )
+       
+    return render_template("loginpage.html")
+
+@app.route("/Logout")
+def logout():
+    session.clear
+
+    return redirect(url_for("loginpage"))
+
 
 @app.route("/updateDummyTables", methods=["POST"]) # NEEDS Data validation pass
 def dummyTablesUpdate():

@@ -115,6 +115,18 @@ body {
     color: var(--color-white);
 }
 
+.dash-logout-btn {
+    margin-top: 0.25rem;
+    border: 1px solid var(--color-gray-700);
+    text-align: center;
+}
+
+.dash-logout-btn:hover {
+    background-color: var(--color-white);
+    color: var(--color-black);
+    border-color: var(--color-white);
+}
+
 /* ---------------------------------------------------------------------
    Topbar
 --------------------------------------------------------------------- */
@@ -409,7 +421,32 @@ main {
 .btn-cancel:hover {
     background-color: var(--color-gray-700);
     color: var(--color-white);
+
     border-color: var(--color-gray-700);
+}
+
+
+
+.btn-danger {
+    background-color: #dc2626;
+    color: var(--color-white);
+    border-color: #dc2626;
+}
+
+.btn-danger:hover {
+    background-color: #b91c1c;
+    border-color: #b91c1c;
+}
+
+.modal-box-sm {
+    max-width: 400px;
+    width: 100%;
+}
+
+.confirm-message {
+    color: var(--color-gray-500);
+    font-size: 0.95rem;
+    margin: 0.5rem 0 1.25rem;
 }
 
 /* ---------------------------------------------------------------------
@@ -441,6 +478,24 @@ main {
 .table-cell small {
     color: var(--color-gray-500);
     font-size: 0.8rem;
+}
+
+.table-cell-add {
+    background-color: var(--color-white);
+    border: 2px dashed var(--color-gray-300);
+    cursor: pointer;
+    justify-content: center;
+}
+
+.table-cell-add:hover {
+    background-color: var(--color-gray-200);
+}
+
+.add-table-icon {
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--color-gray-400);
+    line-height: 1;
 }
 
 /* ---------------------------------------------------------------------
@@ -506,4 +561,247 @@ main {
 .dash-form input:focus {
     outline: 2px solid var(--color-black);
     outline-offset: 1px;
+}
+
+/* ---------------------------------------------------------------------
+   Modal
+--------------------------------------------------------------------- */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-box {
+    background: var(--color-white);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    padding: 2rem;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modal-header h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--color-gray-500);
+    line-height: 1;
+    padding: 0.25rem;
+}
+
+.modal-close:hover {
+    color: var(--color-black);
+}
+
+.modal-form {
+    max-width: none;
+}
+
+.modal-select {
+    width: 100%;
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.95rem;
+    color: var(--color-black);
+    background-color: var(--color-white);
+}
+
+.date-dropdowns {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.date-dropdowns .modal-select {
+    flex: 1;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+/* ---------------------------------------------------------------------
+   Booking Page (public booking form)
+--------------------------------------------------------------------- */
+
+body.booking-page {
+    background-color: black;
+    min-height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#bookingForm {
+    background-color: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 100);
+    width: 100%;
+    max-width: 600px;
+}
+
+#bookingForm h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: black;
+}
+
+.booking-page label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: black;
+}
+
+.booking-page input,
+.booking-page select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.booking-page hr {
+    margin: 50px 0;
+}
+
+.booking-page button {
+    width: 100%;
+    padding: 12px;
+    background-color: rgb(7, 7, 7);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 20px;
+    transition: 1s;
+}
+
+.booking-page button:hover {
+    background-color: #066112;
+}
+
+/* ---------------------------------------------------------------------
+   Login Page
+--------------------------------------------------------------------- */
+
+body.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-black);
+}
+
+.login-card {
+    background-color: var(--color-white);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+    padding: 0.5rem 2rem 2rem 2rem;
+    width: 100%;
+    max-width: 380px;
+}
+
+.login-brand {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.5rem;
+    color: var(--color-black);
+}
+
+.login-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-black);
+    margin-bottom: 0.25rem;
+}
+
+.login-subtitle {
+    font-size: 0.9rem;
+    color: var(--color-gray-500);
+    margin-bottom: 2rem;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+.login-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.login-field label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-gray-700);
+}
+
+.login-field input {
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius);
+    padding: 0.6rem 0.75rem;
+    font-size: 0.95rem;
+    color: var(--color-black);
+    background-color: var(--color-white);
+    transition: border-color 0.15s ease;
+}
+
+.login-field input:focus {
+    outline: none;
+    border-color: var(--color-black);
+}
+
+.login-btn {
+    margin-top: 0.4rem;
+    width: 100%;
+    padding: 0.7rem;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.login-btn:hover {
+    background-color: var(--color-gray-700);
+}
+
+.logo.logo {
+    width: 250px; 
+    height: auto;
+    display: block;
+    margin: 0 auto 5px auto;
 }
