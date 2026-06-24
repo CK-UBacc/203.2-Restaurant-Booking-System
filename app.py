@@ -6,6 +6,7 @@ from wtformsTesting import TestBookingForm
 # import os # not currently being used?
 import datetime
 import calendar as cal_module
+from wtformsTesting import TestBookingForm
 
 app = Flask(__name__)
 
@@ -856,7 +857,7 @@ def dummyTablesUpdate():
 #-------------------------------------------------------------------------------------------------------
 # Settings routes
 #-------------------------------------------------------------------------------------------------------
-@app.route("/dashboard/settings", methods=["GET", "POST"])
+@app.route("/dashboard/settings", methods=["GET","POST"])
 def dashboardSettings():
     # Settings page merged into Manage Tables
     return redirect(url_for("dashboardTables"))
