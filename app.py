@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, session
 from flask_sqlalchemy import SQLAlchemy
 # import os # not currently being used?
 import datetime
@@ -9,6 +9,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///dummy.db"
 app.config["SLQALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "your-secret-key-for-flash-messages" # I forgot what the secret key is but it is super important
 
+from datetime import timedelta #Sets remember me time duration to 30 days
+app.permanent_session_lifetime = timedelta(days=30) #Tells flask how long a single session can be live for
 database = SQLAlchemy(app)
 
 #-------------------------------------------------------------------------------------------------------
@@ -206,6 +208,9 @@ def booking():
 
 @app.route("/dashboard", methods=["GET"]) #NEEDS: HTML pass, code  # ID may not be needed in the URL
 def dashboard():
+
+    if not session.get("logged_in"):
+        return redirect(url_for("loginpage"))
     '''
     Route to dashboard
     Dashboard is supposed to display the restaurants data and act as the hub page for a restaurant manager
@@ -224,6 +229,9 @@ def dashboard():
 
 @app.route("/dashboard/bookings", methods=["GET"])
 def dashboardBookings():
+
+    if not session.get("logged_in"):
+        return redirect(url_for("loginpage"))
     '''
     Route to the manage bookings page of the dashboard.
 
@@ -238,6 +246,9 @@ def dashboardBookings():
 
 @app.route("/dashboard/tables", methods=["GET"])
 def dashboardTables():
+
+    if not session.get("logged_in"):
+        return redirect(url_for("loginpage"))
     '''
     Route to the manage tables page of the dashboard.
 
@@ -273,8 +284,32 @@ def dummyData():
 @app.route("/loginpage", methods=["GET","POST"])
 def loginpage():
     if request.method == "POST":
-        pass
+
+        username = request.form.get("AdminUsername")
+        password = request.form.get("Adminpassword")
+
+        remember_me = request.form.get("remember_me") = "on"
+
+        if username == "admin" and password == "password":
+            session["logged_in"] = True
+            session["username"] = username
+
+            session.permanent = remember_me
+
+            return redirect(url_for("dashboard"))
+        
+        return render_template("loginpage.html"
+                               error="Incorrect Username Or Password"
+                               )
+       
     return render_template("loginpage.html")
+
+@app.route("/Logout")
+def logout():
+    session.clear
+
+    return redirect(url_for("loginpage"))
+
 
 @app.route("/updateDummyTables", methods=["POST"]) # NEEDS Data validation pass
 def dummyTablesUpdate():
