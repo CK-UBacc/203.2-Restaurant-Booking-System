@@ -10,6 +10,7 @@
 <section class="dash-card dash-card-wide">
     <div class="dash-card-header">
         <h2>All Bookings</h2>
+        <button type="button" class="btn btn-primary" onclick="openAddBookingModal()">+ Add Booking</button>
     </div>
     <div class="table-responsive">
         <table class="dash-table">
@@ -23,6 +24,8 @@
                     <th>Time</th>
                     <th>Guests</th>
                     <th>Status</th>
+                    <th>Tables</th>
+                    <th>Special Requests</th>
                     <th>Edit Booking</th>
                 </tr>
             </thead>
@@ -33,20 +36,42 @@
                     <td>{{ booking.name }}</td>
                     <td>{{ booking.phone }}</td>
                     <td>{{ booking.email }}</td>
-                    <td>{{ booking.date }}</td>
-                    <td>{{ booking.time.strftime("%I:%M %p") }}</td>
+                    <td>{{ booking.date.strftime('%d %b %Y') }} - {{ booking.time.strftime('%I:%M %p') }}</td>
                     <td>{{ booking.guestCount }}</td>
                     <td><span class="badge badge-{{ booking.status | lower }}">{{ booking.status }}</span></td>
                     <td>
-                        <button type="button" class="edit-button">
-                        Edit Booking Status
-                        </button>
+                        {% if booking.tables %}
+                            {% for t in booking.tables %}Table {{ t.id }}{% if not loop.last %}, {% endif %}{% endfor %}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td class="td-requests" title="{{ booking.special_requests or '' }}">
+                        {% if booking.special_requests %}
+                            {{ booking.special_requests[:40] }}{% if booking.special_requests | length > 40 %}...{% endif %}
+                        {% else %}
+                            <span style="color:var(--color-gray-400);">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button type="button" class="btn"
+                            data-id="{{ booking.id }}"
+                            data-name="{{ booking.name }}"
+                            data-email="{{ booking.email }}"
+                            data-phone="{{ booking.phone }}"
+                            data-guests="{{ booking.guestCount }}"
+                            data-date="{{ booking.date }}"
+                            data-time="{{ booking.time.strftime('%H:%M:%S') }}"
+                            data-status="{{ booking.status }}"
+                            data-requests="{{ booking.special_requests or '' }}"
+                            data-table-ids="{{ booking.tables | map(attribute='id') | join(',') }}"
+                            onclick="openEditModal(this)">Edit Booking</button>
                     </td>
                 </tr>
 
                 {% else %}
                 <tr>
-                    <td colspan="8" class="dash-empty">No bookings yet.</td>
+                    <td colspan="10" class="dash-empty">No bookings yet.</td>
                 </tr>
                 {% endfor %}
                
@@ -54,5 +79,184 @@
         </table>
     </div>
 </section>
+
+<!-- Edit Booking Modal -->
+<div id="editBookingModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>Edit Booking</h2>
+            <button type="button" class="modal-close" onclick="closeEditModal()">&times;</button>
+        </div>
+        <form id="editBookingForm" method="POST" class="dash-form modal-form">
+            <input type="hidden" name="booking_id" id="editBookingId">
+
+            <label>Name</label>
+            <input type="text" id="editName" name="name" placeholder="John Doe" pattern="[A-Za-z\s]{3,20}" required>
+
+            <label>Email</label>
+            <input type="email" id="editEmail" name="email" placeholder="john@email.com" required>
+
+            <label>Phone</label>
+            <input type="tel" id="editPhone" name="phone" placeholder="498-348-3872" required>
+
+            <label>Group Size</label>
+            <select id="editGuests" name="guestCount" class="modal-select" required>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+            </select>
+
+            <label>Date</label>
+            <input type="date" id="editDate" name="date" class="modal-select" required>
+
+            <label>Time</label>
+            <select id="editTime" name="time" class="modal-select" required>
+                {% for timeSlot in timeSlots %}
+                <option value="{{ timeSlot.slot }}">{{ timeSlot.slot.strftime("%I:%M %p") }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Status</label>
+            <select id="editStatus" name="status" class="modal-select" required>
+                <option value="PENDING">Pending</option>
+                <option value="APPROVED">Approved</option>
+                <option value="CANCELED">Canceled</option>
+                <option value="EXPIRED">Expired</option>
+            </select>
+
+            <label>Assign Tables</label>
+            <div class="table-checkboxes">
+                {% for table in tables %}
+                <label class="table-checkbox-label">
+                    <input type="checkbox" name="table_ids" value="{{ table.id }}">
+                    Table {{ table.id }} - {{ table.seats }} seats
+                </label>
+                {% else %}
+                <p class="dash-empty">No tables available.</p>
+                {% endfor %}
+            </div>
+
+            <label>Special Requests</label>
+            <textarea id="editSpecialRequests" name="special_requests" class="modal-textarea"
+                placeholder="Dietary requirements, allergies, seating preferences..." rows="3"></textarea>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-cancel" onclick="closeEditModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Add Booking Modal -->
+<div id="addBookingModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>Add Booking</h2>
+            <button type="button" class="modal-close" onclick="closeAddBookingModal()">&times;</button>
+        </div>
+        <form method="POST" action="{{ url_for('dashboardBookingsAdd') }}" class="dash-form modal-form">
+            <label>Name</label>
+            <input type="text" name="name" placeholder="John Doe" pattern="[A-Za-z\s]{3,20}" required>
+
+            <label>Email</label>
+            <input type="email" name="email" placeholder="john@email.com" required>
+
+            <label>Phone</label>
+            <input type="tel" name="phone" placeholder="498-348-3872" required>
+
+            <label>Group Size</label>
+            <select name="guestCount" class="modal-select" required>
+                <option value="">Select group size</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+            </select>
+
+            <label>Date</label>
+            <input type="date" id="addDate" name="date" class="modal-select" required>
+
+            <label>Time</label>
+            <select name="time" class="modal-select" required>
+                <option value="">Select time</option>
+                {% for timeSlot in timeSlots %}
+                <option value="{{ timeSlot.slot }}">{{ timeSlot.slot.strftime("%I:%M %p") }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Assign Tables</label>
+            <div class="table-checkboxes">
+                {% for table in tables %}
+                <label class="table-checkbox-label">
+                    <input type="checkbox" name="table_ids" value="{{ table.id }}">
+                    Table {{ table.id }} - {{ table.seats }} seats
+                </label>
+                {% else %}
+                <p class="dash-empty">No tables available.</p>
+                {% endfor %}
+            </div>
+
+            <label>Special Requests</label>
+            <textarea name="special_requests" class="modal-textarea"
+                placeholder="Dietary requirements, allergies, seating preferences..." rows="3"></textarea>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-cancel" onclick="closeAddBookingModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Confirm Booking</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openAddBookingModal() {
+        document.getElementById('addBookingModal').style.display = 'flex';
+    }
+    function closeAddBookingModal() {
+        document.getElementById('addBookingModal').style.display = 'none';
+    }
+    document.getElementById('addBookingModal').addEventListener('click', function(e) {
+        if (e.target === this) closeAddBookingModal();
+    });
+
+    function openEditModal(btn) {
+        const d = btn.dataset;
+        document.getElementById('editBookingId').value = d.id;
+        document.getElementById('editName').value = d.name;
+        document.getElementById('editEmail').value = d.email;
+        document.getElementById('editPhone').value = d.phone;
+        document.getElementById('editGuests').value = d.guests;
+        document.getElementById('editDate').value = d.date;
+        document.getElementById('editTime').value = d.time;
+        document.getElementById('editStatus').value = d.status;
+        document.getElementById('editSpecialRequests').value = d.requests || '';
+        document.getElementById('editBookingForm').action = '/dashboard/bookings/edit/' + d.id;
+
+        // Pre-check tables that are already assigned to this booking
+        const assignedIds = d.tableIds ? d.tableIds.split(',') : [];
+        document.querySelectorAll('#editBookingModal input[name="table_ids"]').forEach(function(cb) {
+            cb.checked = assignedIds.includes(cb.value);
+        });
+
+        document.getElementById('editBookingModal').style.display = 'flex';
+    }
+    function closeEditModal() {
+        document.getElementById('editBookingModal').style.display = 'none';
+    }
+    document.getElementById('editBookingModal').addEventListener('click', function(e) {
+        if (e.target === this) closeEditModal();
+    });
+
+</script>
 
 {% endblock %}
