@@ -19,7 +19,8 @@
                     <th>Customer</th>
                     <th>Phone</th>
                     <th>Email</th>
-                    <th>Date & time</th>
+                    <th>Date</th>
+                    <th>Time</th>
                     <th>Guests</th>
                     <th>Status</th>
                     <th>Edit Booking</th>
@@ -32,7 +33,8 @@
                     <td>{{ booking.name }}</td>
                     <td>{{ booking.phone }}</td>
                     <td>{{ booking.email }}</td>
-                    <td>{{ booking.date }} · {{ booking.time }}</td>
+                    <td>{{ booking.date }}</td>
+                    <td>{{ booking.time.strftime("%I:%M %p") }}</td>
                     <td>{{ booking.guestCount }}</td>
                     <td><span class="badge badge-{{ booking.status | lower }}">{{ booking.status }}</span></td>
                     <td>
@@ -42,12 +44,6 @@
                     </td>
                 </tr>
 
-                
-               
-               
-
-            
-        
                 {% else %}
                 <tr>
                     <td colspan="8" class="dash-empty">No bookings yet.</td>

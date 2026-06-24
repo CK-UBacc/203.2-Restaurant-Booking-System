@@ -46,7 +46,8 @@
                     <tr>
                         <th>Customer</th>
                         <th>Phone</th>
-                        <th>Date & time</th>
+                        <th>Date</th>
+                        <th>Time</th>
                         <th>Guests</th>
                         <th>Status</th>
                     </tr>
@@ -56,7 +57,8 @@
                     <tr>
                         <td>{{ booking.name }}</td>
                         <td>{{ booking.phone }}</td>
-                        <td>{{ booking.date }} · {{ booking.time }}</td>
+                        <td>{{ booking.date }}</td>
+                        <td>{{ booking.time }}</td>
                         <td>{{ booking.guestCount }}</td>
                         <td><span class="badge badge-{{ booking.status | lower }}">{{ booking.status }}</span></td>
                     </tr>
