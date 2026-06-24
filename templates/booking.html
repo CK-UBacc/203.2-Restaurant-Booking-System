@@ -1,269 +1,76 @@
-<!doctype html>
-<html lang="en">
+<!doctype html> 
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reserve a Table{% if restaurant_settings %} - {{ restaurant_settings.restaurant_name }}{% endif %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
 </head>
 
-<body class="booking-page">
+<body>
+<form id="bookingForm" method="POST" action="{{ url_for('booking') }}">
+    
+  <label for="name">First Name</label>
+    <input type="text" name="name" placeholder="John Doe" pattern=[A-Z\sa-z]{3,20} required>
+    <br>
+ 
+  
+    <label for="email">Email Address</label>
+    <input type="email" name="email" placeholder="john.doe@email.com" required>
+    <br>
+  
+    <label for="phone">Phone Number</label>
+    <input type="tel" name="phone" placeholder="498-348-3872" required>
+    
+    <br>
+    <label for="guestCount">Group Size</label>
+    <select name="guestCount" required>
+        <option value="">Please Select the size of your group</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+      
+    </select>
 
-    <header class="booking-header">
-        <span class="booking-brand">
-            {{ restaurant_settings.restaurant_name if restaurant_settings else "TableFlow" }}
-        </span>
-    </header>
+    <br>
+    <label for="date">Reservation date</label>
+    <input type="date" name="date" id="date" required>
+    <br>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <div class="flash-stack" style="max-width:900px;margin:1rem auto 0;padding:0 1rem;">
-        {% for category, message in messages %}
-        <div class="flash flash-{{ category }}">{{ message }}</div>
+    <label for="time">Reservation Time</label>
+    <select name="time" required>
+        <option value="">Please Select a reservation time</option>
+        <!-- Old dummy timeslot options -->
+        <!--<option value="6:00PM">6:00PM</option>
+        <option value="6:30PM">6:30PM</option>
+        <option value="7:00PM">7:00PM</option>
+        <option value="7:30PM">7:30PM</option>
+        <option value="8:00PM">8:00PM</option>
+        <option value="8:30PM">8:30PM</option>
+        <option value="9:00PM">9:00PM</option>
+        <option value="9:30PM">9:30PM</option>
+        <option value="10:00PM">10:00PM</option>
+        <option value="10:30PM">10:30PM</option>
+        <option value="11:00PM">11:00PM</option>-->
+
+        {% if timeSlots %}
+        {% for timeSlot in timeSlots %}
+          <option value="{{ timeSlot.slot }}">{{ timeSlot.slot.strftime("%I:%M %p") }}</option>
         {% endfor %}
-    </div>
-    {% endif %}
-    {% endwith %}
+        {% else %}
 
-    <main class="booking-main">
+        {% endif %}
+    </select>
 
-        <!-- Reservation Form -->
-        <section class="booking-card">
-            <div class="booking-card-top">
-                <h1 class="booking-title">Make a Reservation</h1>
-                <p class="booking-subtitle">We'll send you a confirmation email once your booking is reviewed.</p>
-            </div>
+  <hr>
+ 
+  <button type="submit">Confirm Reservation</button>
 
-            <form id="bookingForm" method="POST" action="{{ url_for('booking') }}" class="booking-form">
+ 
+</form>
 
-                <div class="booking-field">
-                    <label class="booking-label">Full Name</label>
-                    <input class="booking-input" type="text" name="name" placeholder="John Doe" pattern="[A-Za-z\s]{3,20}" required>
-                </div>
-
-                <div class="booking-row">
-                    <div class="booking-field">
-                        <label class="booking-label">Email Address</label>
-                        <input class="booking-input" type="email" name="email" placeholder="john@email.com" required>
-                    </div>
-                    <div class="booking-field">
-                        <label class="booking-label">Phone Number</label>
-                        <input class="booking-input" type="tel" name="phone" placeholder="04 0000 0000" required>
-                    </div>
-                </div>
-
-                <div class="booking-row">
-                    <div class="booking-field">
-                        <label class="booking-label">Reservation Date</label>
-                        <input class="booking-input" type="date" id="inputDate" name="date" min="{{ today.isoformat() }}" required>
-                    </div>
-                    <div class="booking-field">
-                        <label class="booking-label">Reservation Time</label>
-                        <select class="booking-input" id="inputTime" name="time" required>
-                            <option value="">Select a time</option>
-                            <!-- Old dummy timeslot options -->
-                            <!--<option value="6:00PM">6:00PM</option>
-                            <option value="6:30PM">6:30PM</option>
-                            <option value="7:00PM">7:00PM</option>
-                            <option value="7:30PM">7:30PM</option>
-                            <option value="8:00PM">8:00PM</option>
-                            <option value="8:30PM">8:30PM</option>
-                            <option value="9:00PM">9:00PM</option>
-                            <option value="9:30PM">9:30PM</option>
-                            <option value="10:00PM">10:00PM</option>
-                            <option value="10:30PM">10:30PM</option>
-                            <option value="11:00PM">11:00PM</option>-->
-                            {% if timeSlots %}
-                            {% for timeSlot in timeSlots %}
-                            <option value="{{ timeSlot.slot }}">{{ timeSlot.slot.strftime("%I:%M %p") }}</option>
-                            {% endfor %}
-                            {% endif %}
-                        </select>
-                    </div>
-                </div>
-
-                <div class="booking-field">
-                    <label class="booking-label">Group Size</label>
-                    <select class="booking-input" name="guestCount" required>
-                        <option value="">Select group size</option>
-                        <option value="1">1 person</option>
-                        <option value="2">2 people</option>
-                        <option value="3">3 people</option>
-                        <option value="4">4 people</option>
-                        <option value="5">5 people</option>
-                        <option value="6">6 people</option>
-                        <option value="7">7 people</option>
-                        <option value="8">8 people</option>
-                    </select>
-                </div>
-
-                <div class="booking-field">
-                    <label class="booking-label">Special Requests <span class="booking-optional">(optional)</span></label>
-                    <textarea class="booking-input booking-textarea" name="special_requests" placeholder="Dietary requirements, allergies, special occasions..." rows="3"></textarea>
-                </div>
-
-                <!-- Hidden input stores customer's preferred table  -->
-                <input type="hidden" id="preferredTableInput" name="preferred_table_id" value="">
-
-                <button type="submit" class="booking-submit">Confirm Reservation</button>
-
-            </form>
-        </section>
-
-        <!-- Info Sidebar -->
-        <aside class="booking-sidebar">
-
-            {% if restaurant_settings %}
-            <div class="booking-info-card">
-                <h2 class="booking-info-title">Restaurant Info</h2>
-                {% if restaurant_settings.address %}
-                <div class="booking-info-row">
-                    <span class="booking-info-label">Address</span>
-                    <span class="booking-info-value">{{ restaurant_settings.address }}</span>
-                </div>
-                {% endif %}
-                {% if restaurant_settings.phone %}
-                <div class="booking-info-row">
-                    <span class="booking-info-label">Phone</span>
-                    <span class="booking-info-value">{{ restaurant_settings.phone }}</span>
-                </div>
-                {% endif %}
-                {% if restaurant_settings.open_time and restaurant_settings.close_time %}
-                <div class="booking-info-row">
-                    <span class="booking-info-label">Hours</span>
-                    <span class="booking-info-value">{{ restaurant_settings.open_time.strftime('%I:%M %p') }} - {{ restaurant_settings.close_time.strftime('%I:%M %p') }}</span>
-                </div>
-                {% endif %}
-                {% if restaurant_settings.description %}
-                <p class="booking-info-desc">{{ restaurant_settings.description }}</p>
-                {% endif %}
-            </div>
-            {% endif %}
-
-            <!-- Table availability -->
-            <div class="booking-avail-card">
-                <h2 class="booking-info-title">Table Availability</h2>
-                <p class="booking-avail-note" id="availNote">Select a date and time to check availability</p>
-
-                <div id="availBanner" class="booking-avail-banner booking-avail-open" style="display:none;"></div>
-
-                <div id="tableGrid" class="booking-table-grid">
-                    <!-- Initially shows all tables with today's status -->
-                    {% for table in tables %}
-                    <div class="booking-table-cell {{ 'booking-cell-occupied' if table.status == 'OCCUPIED' else 'booking-cell-available' }}"
-                         data-table-id="{{ table.id }}" data-seats="{{ table.seats }}">
-                        <span class="booking-cell-id">T{{ table.id }}</span>
-                        <span class="booking-cell-status">{{ 'Occupied' if table.status == 'OCCUPIED' else 'AVAILABLE' }}</span>
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <p class="booking-avail-hint" id="availHint" style="display:none;">Click an available table to set your seating preference</p>
-            </div>
-
-        </aside>
-
-    </main>
-
-    <footer class="booking-footer">
-        <span>{{ restaurant_settings.restaurant_name if restaurant_settings else "TableFlow" }}</span>
-        <span>Reservations are subject to availability and confirmation</span>
-    </footer>
-
-<script>
-    var dateInput = document.getElementById('inputDate');
-    var timeSelect = document.getElementById('inputTime');
-    var availNote = document.getElementById('availNote');
-    var availBanner = document.getElementById('availBanner');
-    var tableGrid = document.getElementById('tableGrid');
-    var availHint = document.getElementById('availHint');
-    var preferredTableInput = document.getElementById('preferredTableInput');
-    var selectedTableId = null;
-
-    function renderTableCells(tables) {
-        tableGrid.innerHTML = '';
-        selectedTableId = null;
-        preferredTableInput.value = '';
-
-        tables.forEach(function(table) {
-            var isAvailable = table.status === 'AVAILABLE';
-            var cell = document.createElement('div');
-            cell.className = 'booking-table-cell ' + (isAvailable ? 'booking-cell-available booking-cell-clickable' : 'booking-cell-occupied');
-            cell.dataset.tableId = table.id;
-            cell.innerHTML =
-                '<span class="booking-cell-id">T' + table.id + '</span>' +
-                '<span class="booking-cell-seats">' + table.seats + 'p</span>' +
-                '<span class="booking-cell-status">' + (isAvailable ? 'Free' : 'Occupied') + '</span>';
-
-            if (isAvailable) {
-                cell.addEventListener('click', function() {
-                    if (selectedTableId === table.id) {
-                        cell.classList.remove('booking-cell-selected');
-                        selectedTableId = null;
-                        preferredTableInput.value = '';
-                    } else {
-                        tableGrid.querySelectorAll('.booking-cell-selected').forEach(function(el) {
-                            el.classList.remove('booking-cell-selected');
-                        });
-                        cell.classList.add('booking-cell-selected');
-                        selectedTableId = table.id;
-                        preferredTableInput.value = table.id;
-                    }
-                });
-            }
-
-            tableGrid.appendChild(cell);
-        });
-    }
-
-    function updateAvailability() {
-        var date = dateInput.value;
-        var time = timeSelect.value;
-
-        if (!date || !time) {
-            availNote.textContent = 'Select a date and time to check availability';
-            availBanner.style.display = 'none';
-            availHint.style.display = 'none';
-            return;
-        }
-
-        availNote.textContent = 'Checking...';
-        availBanner.style.display = 'none';
-        availHint.style.display = 'none';
-        tableGrid.innerHTML = '<div class="booking-avail-loading">Loading availability...</div>';
-
-        fetch('/api/availability?date=' + date + '&time=' + encodeURIComponent(time))
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                var tables = data.tables;
-                var count = data.available_count;
-
-                var dateFormatted = new Date(date + 'T00:00:00').toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
-                availNote.textContent = 'Availability for ' + dateFormatted;
-
-                availBanner.style.display = 'flex';
-                if (count > 0) {
-                    availBanner.className = 'booking-avail-banner booking-avail-open';
-                    availBanner.innerHTML =
-                        '<span class="booking-avail-num">' + count + '</span>' +
-                        '<span class="booking-avail-text">tables available</span>';
-                    availHint.style.display = 'block';
-                } else {
-                    availBanner.className = 'booking-avail-banner booking-avail-full';
-                    availBanner.innerHTML = '<span class="booking-avail-text">No tables available for this time</span>';
-                }
-
-                renderTableCells(tables);
-            })
-            .catch(function() {
-                availNote.textContent = 'Could not load availability';
-                tableGrid.innerHTML = '';
-            });
-    }
-
-    dateInput.addEventListener('change', updateAvailability);
-    timeSelect.addEventListener('change', updateAvailability);
-</script>
-
-</body>
+</body> 
 </html>
