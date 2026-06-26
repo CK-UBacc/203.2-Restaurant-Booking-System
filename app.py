@@ -118,6 +118,16 @@ class RestaurantSettings(database.Model): # Restaurant-level config one row only
     days_open         = database.Column(database.String(7),default="1111100") # Mon-Sun, 1=open 0=closed
     auto_confirm      = database.Column(database.Boolean,default=False)# auto approve new bookings
 
+
+#user login table made in database
+class User(database.Model):
+    __tablename__ = "users"
+
+
+    id = database.Column(database.Integer, primary_key=True)
+    username = database.Column(database.String(50), unique=True, nullable=False )
+    password = database.Column(database.String(50), nullable=False)
+
 def initializeDummyDatabase(): # Crate dummy database file with dummy data in tables
     '''
     Creates a dummy database for testing
@@ -219,6 +229,13 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
             open_time         = datetime.time(10, 0),
             close_time        = datetime.time(22, 0),
             days_open         = "1111100"
+        )) 
+
+
+        #Created the default admin login
+        database.session.add(User(
+            username="admin123",
+            password="admin123"
         ))
 
         print("COMMITING TABLE CHANGES")
@@ -804,6 +821,8 @@ def dummyData():
                            timeSlots=timeSlots
                            )
 
+
+#checks users login by looking for it in the
 @app.route("/loginpage", methods=["GET","POST"])
 def loginpage():
     if request.method == "POST":
@@ -813,9 +832,14 @@ def loginpage():
 
         remember_me = request.form.get("remember_me") == "on"
 
-        if username == "admin123" and password == "admin123":
+        user = User.query.filter_by(
+            username=username,
+            password=password
+        ).first()
+
+        if user:
             session["logged_in"] = True
-            session["username"] = username
+            session["username"] = user.username
 
             session.permanent = remember_me
 
