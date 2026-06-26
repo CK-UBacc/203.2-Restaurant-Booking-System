@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login · TableFlow</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Login</title>
+
 </head>
 <body class="login-page">
 
@@ -20,31 +21,29 @@
             <div class="flash flash-{{ category }}">{{ message }}</div>
             {% endfor %}
         </div>
-        {% endif %}
-        {% endwith %}
-
-        <form method="POST" action="{{ url_for('loginpage') }}" class="login-form">
-            <div class="login-field">
-                <label for="AdminUsername">Username</label>
-                <input
-                    type="text"
-                    id="AdminUsername"
-                    name="AdminUsername"
-                    placeholder="Enter your username"
+        
+        
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="AdminDashboard-Group">
+                <label for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="AdminUsername" 
+                    name="AdminUsername" 
+                    placeholder="Enter Your Username"
                     required
-                    autocomplete="username"
+                    
                 >
             </div>
-
-            <div class="login-field">
-                <label for="Adminpassword">Password</label>
-                <input
-                    type="password"
-                    id="Adminpassword"
-                    name="Adminpassword"
-                    placeholder="Enter your password"
+            
+            <div class="AdminDashboard-Group">
+                <label for="Password">Password</label>
+                <input 
+                    type="Adminpassword" 
+                    id="Adminpassword" 
+                    name="Adminpassword" 
+                    placeholder="Enter Your Password"
                     required
-                    autocomplete="current-password"
                 >
             </div>
 
@@ -57,7 +56,17 @@
 
            
         </form>
+        
+    
+    </div>
+
+    <div class="form-footer">
+        <p>Don't have an account?</p>
+        <a href="{{ url_for('register') }}">
+        <button type="Create Account">Create Account</button>
+        </a>
     </div>
     
 </body>
+
 </html>

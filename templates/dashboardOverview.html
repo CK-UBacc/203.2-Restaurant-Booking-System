@@ -81,9 +81,44 @@
         <div class="dash-card-header-right">
             <a href="{{ url_for('dashboardTables') }}" class="btn">Manage tables</a>
         </div>
-    </div>
-    <div class="floor-room">
-        <div class="floor-grid">
+        <div class="table-responsive">
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Guests</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.name }}</td>
+                        <td>{{ booking.phone }}</td>
+                        <td>{{ booking.date }}</td>
+                        <td>{{ booking.time }}</td>
+                        <td>{{ booking.guestCount }}</td>
+                        <td><span class="badge badge-{{ booking.status | lower }}">{{ booking.status }}</span></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="dash-empty">No bookings yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="dash-card">
+        <div class="dash-card-header">
+            <h2>Table Floor Plan</h2>
+            <a href="{{ url_for('dashboardTables') }}" class="dash-link">Manage tables →</a>
+        </div>
+        <div class="table-grid">
             {% for table in tables %}
             <div class="floor-box {% if table_statuses[table.id] == 'OCCUPIED' %}floor-box-occupied{% endif %}"
                  style="cursor:default;">
@@ -96,45 +131,10 @@
                 </div>
             </div>
             {% else %}
-            <p class="dash-empty">No tables yet.</p>
+            <p class="dash-empty">No table data yet.</p>
             {% endfor %}
         </div>
-    </div>
-</section>
-
-<section class="dash-card dash-card-wide" style="margin-top:1rem;">
-    <div class="dash-card-header">
-        <h2>Recent Bookings</h2>
-        <a href="{{ url_for('dashboardBookings') }}" class="dash-link">View all</a>
-    </div>
-    <div class="table-responsive">
-        <table class="dash-table">
-            <thead>
-                <tr>
-                    <th>Customer</th>
-                    <th>Phone</th>
-                    <th>Date & time</th>
-                    <th>Guests</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for booking in bookings %}
-                <tr>
-                    <td>{{ booking.name }}</td>
-                    <td>{{ booking.phone }}</td>
-                    <td>{{ booking.date }} - {{ booking.time }}</td>
-                    <td>{{ booking.guestCount }}</td>
-                    <td><span class="badge badge-{{ booking.status | lower }}">{{ booking.status }}</span></td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="5" class="dash-empty">No bookings yet.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</section>
+    </section>
+</div>
 
 {% endblock %}

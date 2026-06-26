@@ -1,4 +1,4 @@
-﻿/* ---------------------------------------------------------------------
+/* ---------------------------------------------------------------------
    TableFlow Dashboard
    Monochrome theme: white, black and gray only
 --------------------------------------------------------------------- */
@@ -115,18 +115,6 @@ body {
     color: var(--color-white);
 }
 
-.dash-logout-btn {
-    margin-top: 0.25rem;
-    border: 1px solid var(--color-gray-700);
-    text-align: center;
-}
-
-.dash-logout-btn:hover {
-    background-color: var(--color-white);
-    color: var(--color-black);
-    border-color: var(--color-white);
-}
-
 /* ---------------------------------------------------------------------
    Topbar
 --------------------------------------------------------------------- */
@@ -157,15 +145,6 @@ body {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    text-decoration: none;
-    color: inherit;
-    padding: 0.4rem 0.6rem;
-    border-radius: var(--radius);
-    transition: background-color 0.15s ease;
-}
-
-.dash-user:hover {
-    background-color: var(--color-gray-100);
 }
 
 .dash-user small {
@@ -257,113 +236,6 @@ main {
     font-size: 2rem;
     font-weight: 700;
     margin-top: 0.4rem;
-}
-
-/* Period filter tabs (Statistics page) */
-.stat-period-tabs {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1.25rem;
-    flex-wrap: wrap;
-}
-
-.stat-period-tab {
-    padding: 0.35rem 0.9rem;
-    border-radius: 999px;
-    border: 1px solid var(--color-gray-300);
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--color-gray-600);
-    text-decoration: none;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
-}
-
-.stat-period-tab:hover {
-    background: var(--color-gray-100);
-    border-color: var(--color-gray-400);
-}
-
-.stat-period-tab.active {
-    background: var(--color-black);
-    color: var(--color-white);
-    border-color: var(--color-black);
-}
-
-.stat-period-tab-ref {
-    padding: 0.35rem 0.9rem;
-    border-radius: 999px;
-    border: 1px dashed var(--color-gray-400);
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--color-gray-500);
-}
-
-/* Section label above stat groups */
-.stat-section-label {
-    font-size: 0.78rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: var(--color-gray-500);
-    margin-bottom: 0.6rem;
-}
-
-.stat-section-note {
-    font-weight: 400;
-    font-size: 0.75rem;
-    text-transform: none;
-    letter-spacing: 0;
-    color: var(--color-gray-400);
-    margin-left: 0.4rem;
-}
-
-/* Revenue card accent */
-.stat-card-accent {
-    border-left: 3px solid var(--color-black);
-}
-
-.stat-card-accent .stat-value {
-    color: var(--color-black);
-}
-
-/* Best sellers progress bar */
-.stat-bar-track {
-    background: var(--color-gray-200);
-    border-radius: 4px;
-    height: 5px;
-    margin-top: 5px;
-    overflow: hidden;
-}
-
-.stat-bar-fill {
-    background: var(--color-black);
-    height: 100%;
-    border-radius: 4px;
-    min-width: 4px;
-}
-
-/* Payment method badges (Recent Orders table) */
-.badge-payment {
-    display: inline-block;
-    padding: 0.15rem 0.5rem;
-    border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: var(--color-gray-100);
-    color: var(--color-gray-600);
-    border: 1px solid var(--color-gray-300);
-}
-
-.badge-payment-cash {
-    background: #f0fdf4;
-    color: #166534;
-    border-color: #bbf7d0;
-}
-
-.badge-payment-card {
-    background: #eff6ff;
-    color: #1d4ed8;
-    border-color: #bfdbfe;
 }
 
 /* ---------------------------------------------------------------------
@@ -537,32 +409,7 @@ main {
 .btn-cancel:hover {
     background-color: var(--color-gray-700);
     color: var(--color-white);
-
     border-color: var(--color-gray-700);
-}
-
-
-
-.btn-danger {
-    background-color: #dc2626;
-    color: var(--color-white);
-    border-color: #dc2626;
-}
-
-.btn-danger:hover {
-    background-color: #b91c1c;
-    border-color: #b91c1c;
-}
-
-.modal-box-sm {
-    max-width: 400px;
-    width: 100%;
-}
-
-.confirm-message {
-    color: var(--color-gray-500);
-    font-size: 0.95rem;
-    margin: 0.5rem 0 1.25rem;
 }
 
 /* ---------------------------------------------------------------------
@@ -594,24 +441,6 @@ main {
 .table-cell small {
     color: var(--color-gray-500);
     font-size: 0.8rem;
-}
-
-.table-cell-add {
-    background-color: var(--color-white);
-    border: 2px dashed var(--color-gray-300);
-    cursor: pointer;
-    justify-content: center;
-}
-
-.table-cell-add:hover {
-    background-color: var(--color-gray-200);
-}
-
-.add-table-icon {
-    font-size: 2rem;
-    font-weight: 300;
-    color: var(--color-gray-400);
-    line-height: 1;
 }
 
 /* ---------------------------------------------------------------------
@@ -670,7 +499,6 @@ main {
     border-radius: var(--radius);
     padding: 0.5rem 0.75rem;
     font-size: 0.95rem;
-    font-family: inherit;
     color: var(--color-black);
     background-color: var(--color-white);
 }
