@@ -233,10 +233,13 @@ def initializeDummyDatabase(): # Crate dummy database file with dummy data in ta
 
 
         #Created the default admin login
-        database.session.add(User(
-            username="admin123",
-            password="admin123"
-        ))
+        database.session.add_all([
+            User(username="admin123", password="admin123"),
+            User(username="admin321", password="admin321")
+
+        ])
+            
+        
 
         print("COMMITING TABLE CHANGES")
         database.session.commit()
