@@ -1,7 +1,7 @@
 '''
 
 '''
-from flask import Blueprint, request, redirect, url_for, render_template, flash
+from flask import Blueprint, request, redirect, url_for, render_template, flash, current_app
 from flask_mail import Mail, Message
 from .models import database, RestaurantSettings, Booking, Table, TimeSlot
 import datetime
@@ -16,7 +16,7 @@ def send_booking_confirmation(booking, settings):
     # Skip if customer has no email 
     #Sends booking confirmation to customer, after the reservation is made.
 
-    if not booking.email or not app.config.get("MAIL_USERNAME"):
+    if not booking.email or not current_app.config.get("MAIL_USERNAME"):
         return
     #doesnt send a email if the customer has no email or mail server isnt configured
     try:
@@ -24,7 +24,7 @@ def send_booking_confirmation(booking, settings):
         #creates email confrimation email
         msg = Message(
             subject=f"Booking Received - {restaurant_name}",
-            sender=app.config["MAIL_USERNAME"],
+            sender=current_app.config["MAIL_USERNAME"],
             recipients=[booking.email]
         )
         msg.body = (
@@ -103,9 +103,12 @@ def booking():
             database.session.commit()
 
             #sends customer a booking confirmation email
-            send_booking_confirmation(newBooking, RestaurantSettings.query.first())
+            try:
+                send_booking_confirmation(newBooking, RestaurantSettings.query.first())
+            except Exception as e:
+                print(f"Email send failed: {e}")
 
-            return redirect(url_for("bookingSuccess", booking_id=newBooking.id))
+            return redirect(url_for("booking.bookingSuccessPage", booking_id=newBooking.id))
 
         except Exception as e:
             print(f"ERROR! {str(e)}")
@@ -120,10 +123,16 @@ def booking():
 
 #Displays Booking confirmation page once the user has made a booking with us.
 @bookingRoute.route("/booking/success/<int:booking_id>", methods=["GET"])
-def bookingSuccess(booking_id):
+def bookingSuccessPage(booking_id):
     '''
     
+    Route to booking confirmation page.
+
+    Displayed after a customer successfully submits a booking.
+
+    :return render_template: template for the booking success page
     '''
     #Gets the booking from the database using its unique ID, If the booking cannot be found it displays error cannot be found
-    booking = Booking.query.get_or_404(booking_id)
-    return render_template("bookingSuccess.html", booking=booking)
+    booking = Booking.query.get_or_404(booking_id) 
+    restaurant_settings = RestaurantSettings.query.first()
+    return render_template("bookingSuccess.html", booking=booking, restaurant_settings=restaurant_settings)

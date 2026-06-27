@@ -16,8 +16,7 @@ def index():
 
     :return render_template: template for the home page
     '''
-    #return redirect(url_for("dashboard"))
-    return redirect(url_for("login.loginpage"))
+    return render_template("indexMain.html")
 
 @view.route("/api/availability")
 def apiAvailability():
