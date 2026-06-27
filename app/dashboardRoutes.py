@@ -18,6 +18,8 @@ dashboard = Blueprint("dashboard", __name__)
 
 # Dashboard overview function name needed to be changed from dashboard to dashboard index as dashboard is now being used for the blueprint name
 # This will cause problems but aeugh.
+
+#Displays main dashboard overview and shows todays bookings
 @dashboard.route("", methods=["GET"])
 def dashboardIndex():
     '''Route to dashboard
@@ -57,6 +59,7 @@ def dashboardIndex():
 # Booking management
 #--------------------------------------------------
 @dashboard.route("/bookings", methods=["GET"])
+#Displays all bookings so the admin can view and manage them
 def dashboardBookings():
     '''Route to the manage bookings page of the dashboard.
 
@@ -71,7 +74,7 @@ def dashboardBookings():
     return render_template("dashboardBookings.html", bookings=bookings, timeSlots=timeSlots, tables=tables, active="bookings")
 
 @dashboard.route("/bookings/add", methods=["POST"])
-def dashboardBookingsAdd():
+def dashboardBookingsAdd(): #Creates new booking from admin dashboard and saves it to the database
     '''Create a new booking record in the database
 
     New bookings show "PENDING" status by default though it can be changed to "APPROVED" on the restaurant-info page.
@@ -114,7 +117,7 @@ def dashboardBookingsAdd():
     return redirect(url_for("dashboard.dashboardBookings"))
 
 @dashboard.route("/bookings/approve/<int:id>", methods=["POST"])
-def dashboardBookingsApprove(id):
+def dashboardBookingsApprove(id): #Approves a selected booking by changing the status to approved
     '''Quickly approves a pending booking by setting status to APPROVED
     
     :return redirect: Redirects to the dashboard overview page
@@ -130,7 +133,7 @@ def dashboardBookingsApprove(id):
     return redirect(url_for("dashboard.dashboardIndex"))
 
 @dashboard.route("/bookings/edit/<int:id>", methods=["POST"])
-def dashboardBookingsEdit(id):
+def dashboardBookingsEdit(id): #Updates an existing booking with details entered in by the admin
     '''Updates all fields of an exist booking (name, email, phone, guest count,date, time, and status)
     
     :return redirect: Redirects to the bookings dashboard
@@ -169,7 +172,7 @@ def dashboardBookingsEdit(id):
 # as the table management page was supposed to manage the restaurant settings.
 # this is why all the functions are called some variation of "dashboardTable"
 @dashboard.route("/restaurant-info", methods=["GET", "POST"])
-def dashboardTables():
+def dashboardTables(): #Displays and updates restuarant info, table settings and booking rules + opening hours
     '''Route to the manage tables page of the dashboard.
     Also handles settings POST requests (merged from dashboardSettings).
 
@@ -274,7 +277,7 @@ def dashboardTables():
     )
 
 @dashboard.route("/restaurant-info/add", methods=["POST"])
-def dashboardTablesAdd():
+def dashboardTablesAdd(): #Add new tables to the restuarant floor plan with a set number of seats assigned to the table by the admin
     '''Creates a new table record with the specific seat count
     
     :return redirect: Redirects to the restaurant-info dashboard.
@@ -290,7 +293,7 @@ def dashboardTablesAdd():
     return redirect(url_for("dashboard.dashboardTables"))
 
 @dashboard.route("/restaurant-info/edit/<int:id>", methods=["POST"])
-def dashboardTablesEdit(id):
+def dashboardTablesEdit(id): #Updates the seat count for restaurant tables that already exist 
     '''Updates the seat number in existing table.
     
     :param int id: ID of the table.
@@ -309,7 +312,7 @@ def dashboardTablesEdit(id):
 
 # Is this even used anymore?
 @dashboard.route("/restaurant-info/toggle/<int:id>", methods=["POST"])
-def dashboardTablesToggle(id):
+def dashboardTablesToggle(id): #Changes tables status from available to reserved or canceled 
     '''Manually set table status (AVAILABLE / RESERVED / OCCUPIED)
 
     :param int id: ID of the table.
@@ -329,7 +332,7 @@ def dashboardTablesToggle(id):
     return redirect(url_for("dashboard.dashboardTables"))
 
 @dashboard.route("/restaurant-info/delete/<int:id>", methods=["POST"])
-def dashboardTablesDelete(id):
+def dashboardTablesDelete(id): #Deleted table selected by the admin. from the existing table availability.
     '''Delete a table
 
     :param int id: ID of the table.
@@ -347,7 +350,7 @@ def dashboardTablesDelete(id):
     return redirect(url_for("dashboardTables"))
 
 @dashboard.route("/settings/timeslots/add", methods=["POST"])
-def dashboardTimeSlotAdd():
+def dashboardTimeSlotAdd(): #Adds a new time slot to the restuaruants settings
     try:
         slot_str = request.form.get("slot") # "HH:MM" from <input type="time">
         slot = datetime.time.fromisoformat(slot_str)
@@ -364,7 +367,7 @@ def dashboardTimeSlotAdd():
 
 
 @dashboard.route("/settings/timeslots/delete", methods=["POST"])
-def dashboardTimeSlotDelete():
+def dashboardTimeSlotDelete(): #Removes and existing time slot from the restaurants settings
     try:
         slot_str = request.form.get("slot") # "HH:MM:SS" from hidden field
         slot = datetime.time.fromisoformat(slot_str)
@@ -382,7 +385,7 @@ def dashboardTimeSlotDelete():
 # Statistics page
 #--------------------------------------------------
 @dashboard.route("/statistics", methods=["GET"])
-def dashboardStatistics():
+def dashboardStatistics(): #Displays booking stats, Such as total,group size etc 
     '''
     
     :return render_template: Template for the statistics page and all of the data for it
