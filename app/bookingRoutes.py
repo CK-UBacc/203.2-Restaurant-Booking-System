@@ -4,7 +4,7 @@
 from flask import Blueprint, request, redirect, url_for, render_template, flash
 from flask_mail import Mail, Message
 from .models import database, RestaurantSettings, Booking, Table, TimeSlot
-from datetime import datetime
+import datetime
 
 bookingRoute = Blueprint("booking", __name__)
 mail = Mail()

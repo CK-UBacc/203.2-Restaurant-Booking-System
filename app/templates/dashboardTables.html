@@ -1,0 +1,333 @@
+{% extends "dashboardBase.html" %}
+
+{% block title %}Manage Tables{% endblock %}
+
+{% block heading %}Manage Tables{% endblock %}
+{% block subtitle %}View and manage the restaurant's tables{% endblock %}
+
+{% block content %}
+
+{% set d = settings.days_open or '1111100' %}
+
+<!-- Floor Plan -->
+<section class="dash-card" style="padding:0; overflow:hidden;">
+    <div class="dash-card-header" style="padding: 1rem 1rem 0.3rem 1rem;">
+        <h2>Table Floor Plan</h2>
+        <div class="dash-card-header-right">
+            <button type="button" class="btn btn-primary" onclick="openAddTableModal()">+ Add Table</button>
+        </div>
+    </div>
+
+    <!-- Rectangular room boundary -->
+    <div class="floor-room">
+        <div class="floor-grid">
+            {% for table in tables %}
+            <div class="floor-box {% if table_statuses[table.id] == 'OCCUPIED' %}floor-box-occupied{% endif %}"
+                 data-id="{{ table.id }}"
+                 data-seats="{{ table.seats }}"
+                 data-status="{{ table_statuses[table.id] }}"
+                 onclick="openEditTableModal(this)">
+                <div class="floor-box-circle">{{ table.id }}</div>
+                <div class="floor-box-seats">{{ table.seats }} seats</div>
+            </div>
+            {% endfor %}
+
+            <!-- Add new table cell -->
+            <div class="floor-box floor-box-add" onclick="openAddTableModal()">
+                <div class="floor-box-add-icon">+</div>
+                <div class="floor-box-seats">Add Table</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Row 1: Restaurant info + Booking Rules -->
+<div class="dash-grid">
+
+    <!-- Restaurant Info -->
+    <section class="dash-card">
+        <div class="dash-card-header">
+            <h2>Restaurant Info</h2>
+        </div>
+        <form method="POST" action="{{ url_for('dashboard.dashboardTables') }}" class="dash-form settings-form">
+            <input type="hidden" name="section" value="info">
+
+            <label>Restaurant Name</label>
+            <input type="text" name="restaurant_name"
+                value="{{ settings.restaurant_name or '' }}" placeholder="My Restaurant" required>
+
+            <label>Address</label>
+            <input type="text" name="address"
+                value="{{ settings.address or '' }}" placeholder="123 Main Street">
+
+            <label>Phone</label>
+            <input type="tel" name="phone"
+                value="{{ settings.phone or '' }}" placeholder="04 0000 0000">
+
+            <label>Email</label>
+            <input type="email" name="email"
+                value="{{ settings.email or '' }}" placeholder="hello@restaurant.com">
+
+            <label>Welcome Message <span class="label-hint">(shown on booking form)</span></label>
+            <textarea name="description" class="modal-textarea" rows="3"
+                placeholder="Welcome! We look forward to having you.">{{ settings.description or '' }}</textarea>
+
+            <div class="settings-actions">
+                <button type="submit" class="btn btn-primary">Save Info</button>
+            </div>
+        </form>
+    </section>
+
+    <!-- Booking Rules -->
+    <section class="dash-card">
+        <div class="dash-card-header">
+            <h2>Booking Rules</h2>
+        </div>
+        <form method="POST" action="{{ url_for('dashboard.dashboardTables') }}" class="dash-form settings-form">
+            <input type="hidden" name="section" value="rules">
+
+            <label>Max Party Size</label>
+            <div class="settings-input-row">
+                <input type="number" name="max_party_size"
+                    value="{{ settings.max_party_size or 8 }}" min="1" max="50" required>
+                <span class="input-unit">guests</span>
+            </div>
+
+            <label>Min Advance Notice</label>
+            <div class="settings-input-row">
+                <input type="number" name="min_advance_hours"
+                    value="{{ settings.min_advance_hours or 2 }}" min="0" max="72" required>
+                <span class="input-unit">hours before</span>
+            </div>
+
+            <div class="settings-rule-hint">
+                Guests must book at least <strong>{{ settings.min_advance_hours or 2 }}h</strong> in advance.
+                Max group size: <strong>{{ settings.max_party_size or 8 }}</strong>.
+            </div>
+
+            <div class="settings-actions">
+                <button type="submit" class="btn btn-primary">Save Rules</button>
+            </div>
+        </form>
+    </section>
+
+</div>
+
+<!-- Row 2: Booking Automation -->
+<div class="dash-grid">
+
+    <!-- Booking Automation -->
+    <section class="dash-card">
+        <div class="dash-card-header">
+            <h2>Booking Automation</h2>
+        </div>
+        <form method="POST" action="{{ url_for('dashboard.dashboardTables') }}" class="dash-form settings-form">
+            <input type="hidden" name="section" value="booking_automation">
+
+            <div class="settings-toggle-row">
+                <div>
+                    <p class="settings-toggle-label">Auto Confirm Bookings</p>
+                    <p class="settings-toggle-hint">When enabled, new bookings are automatically set to Approved instead of Pending.</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" name="auto_confirm" value="1"
+                           {% if settings.auto_confirm %}checked{% endif %}
+                           onchange="this.form.submit()">
+                    <span class="toggle-track">
+                        <span class="toggle-thumb"></span>
+                    </span>
+                </label>
+            </div>
+
+            <div class="settings-rule-hint" style="margin-top:0.75rem;">
+                Status:
+                {% if settings.auto_confirm %}
+                <strong style="color:#166534;">Auto Confirm is ON</strong> new bookings go straight to Approved
+                {% else %}
+                <strong style="color:var(--color-gray-500);">Auto Confirm is OFF</strong> new bookings require manual approval
+                {% endif %}
+            </div>
+        </form>
+    </section>
+
+</div>
+
+<!-- Row 3: Operating Hours + Time Slots -->
+<div class="dash-grid">
+
+    <!-- Operating Hours -->
+    <section class="dash-card">
+        <div class="dash-card-header">
+            <h2>Operating Hours</h2>
+        </div>
+        <form method="POST" action="{{ url_for('dashboard.dashboardTables') }}" class="dash-form settings-form">
+            <input type="hidden" name="section" value="hours">
+
+            <label>Opening Time</label>
+            <input type="time" name="open_time"
+                value="{{ settings.open_time.strftime('%H:%M') if settings.open_time else '10:00' }}" required>
+
+            <label>Closing Time</label>
+            <input type="time" name="close_time"
+                value="{{ settings.close_time.strftime('%H:%M') if settings.close_time else '22:00' }}" required>
+
+            <label>Days Open</label>
+            <div class="days-picker">
+                {% for label, key, idx in [('Mon','mon',0),('Tue','tue',1),('Wed','wed',2),('Thu','thu',3),('Fri','fri',4),('Sat','sat',5),('Sun','sun',6)] %}
+                <label class="day-checkbox">
+                    <input type="checkbox" name="{{ key }}"
+                        {% if d[idx] == '1' %}checked{% endif %}>
+                    <span>{{ label }}</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <div class="settings-actions">
+                <button type="submit" class="btn btn-primary">Save Hours</button>
+            </div>
+        </form>
+    </section>
+
+    <!-- Time Slots -->
+    <section class="dash-card">
+        <div class="dash-card-header">
+            <h2>Time Slots</h2>
+        </div>
+
+        <!-- Current slots -->
+        <div class="timeslot-grid">
+            {% for ts in timeSlots %}
+            <div class="timeslot-item">
+                <span>{{ ts.slot.strftime("%I:%M %p") }}</span>
+                <form method="POST" action="{{ url_for('dashboard.dashboardTimeSlotDelete') }}">
+                    <input type="hidden" name="slot" value="{{ ts.slot.strftime('%H:%M:%S') }}">
+                    <button type="submit" class="btn-icon" title="Remove">&#x2715;</button>
+                </form>
+            </div>
+            {% else %}
+            <p class="dash-empty">No time slots yet.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Add new slot -->
+        <form method="POST" action="{{ url_for('dashboard.dashboardTimeSlotAdd') }}"
+            class="dash-form" style="max-width:100%; margin-top:1rem;">
+            <label>Add Time Slot</label>
+            <div class="settings-input-row">
+                <input type="time" name="slot" required>
+                <button type="submit" class="btn btn-primary">Add</button>
+            </div>
+        </form>
+    </section>
+
+</div>
+
+<!-- Add Table Modal -->
+<div id="addTableModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>Add Table</h2>
+            <button type="button" class="modal-close" onclick="closeAddTableModal()">&times;</button>
+        </div>
+        <form method="POST" action="{{ url_for('dashboard.dashboardTablesAdd') }}" class="dash-form modal-form">
+            <label>Number of Seats</label>
+            <input type="number" name="seats" min="1" max="20" placeholder="e.g. 4" required>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-cancel" onclick="closeAddTableModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Table</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Table Modal -->
+<div id="editTableModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2 id="editTableTitle">Edit Table</h2>
+            <button type="button" class="modal-close" onclick="closeEditTableModal()">&times;</button>
+        </div>
+
+        <p id="editTableStatusLabel" style="margin-bottom:1rem; font-size:0.9rem;"></p>
+
+        <form id="editTableForm" method="POST" class="dash-form modal-form">
+            <label>Number of Seats</label>
+            <input type="number" id="editTableSeats" name="seats" min="1" max="20" required>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-cancel" onclick="closeEditTableModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+
+        <form id="deleteTableForm" method="POST" style="margin-top:0.5rem;">
+            <button type="button" class="btn btn-danger" style="width:100%;" onclick="openDeleteConfirm()">Delete Table</button>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteConfirmModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box modal-box-sm">
+        <div class="modal-header">
+            <h2>Delete Table</h2>
+            <button type="button" class="modal-close" onclick="closeDeleteConfirm()">&times;</button>
+        </div>
+        <p class="confirm-message">Are you sure you want to delete this table? This action cannot be undone.</p>
+        <div class="modal-actions">
+            <button type="button" class="btn btn-cancel" onclick="closeDeleteConfirm()">Cancel</button>
+            <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete Table</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openAddTableModal()  { document.getElementById('addTableModal').style.display  = 'flex'; }
+    function closeAddTableModal() { document.getElementById('addTableModal').style.display  = 'none'; }
+    document.getElementById('addTableModal').addEventListener('click', function(e) {
+        if (e.target === this) closeAddTableModal();
+    });
+
+    function openEditTableModal(btn) {
+        var id     = btn.dataset.id;
+        var seats  = btn.dataset.seats;
+        var status = btn.dataset.status; /* AVAILABLE or OCCUPIED */
+
+        document.getElementById('editTableTitle').textContent = 'Table ' + id;
+        document.getElementById('editTableSeats').value       = seats;
+        var toggleUrl = '/dashboard/tables/toggle/' + id;
+        document.getElementById('editTableForm').action      = '/dashboard/tables/edit/'   + id;
+        document.getElementById('deleteTableForm').action    = '/dashboard/tables/delete/' + id;
+
+        /* Status label */
+        var labelEl = document.getElementById('editTableStatusLabel');
+        // Table occupation status is not used so it has been removed
+        /*if (status === 'OCCUPIED') {
+            labelEl.innerHTML = 'Status: <span class="badge badge-expired">Occupied</span>';
+        } else if (status === 'RESERVED') {
+            labelEl.innerHTML = 'Status: <span class="badge badge-pending">Reserved</span>';
+        } else {
+            labelEl.innerHTML = 'Status: <span class="badge badge-approved">Available</span>';
+        }*/
+
+        document.getElementById('editTableModal').style.display = 'flex';
+    }
+    function closeEditTableModal() { document.getElementById('editTableModal').style.display = 'none'; }
+    document.getElementById('editTableModal').addEventListener('click', function(e) {
+        if (e.target === this) closeEditTableModal();
+    });
+
+    function openDeleteConfirm() {
+        document.getElementById('editTableModal').style.display    = 'none';
+        document.getElementById('deleteConfirmModal').style.display = 'flex';
+    }
+    function closeDeleteConfirm() {
+        document.getElementById('deleteConfirmModal').style.display = 'none';
+        document.getElementById('editTableModal').style.display    = 'flex';
+    }
+    function confirmDelete() { document.getElementById('deleteTableForm').submit(); }
+    document.getElementById('deleteConfirmModal').addEventListener('click', function(e) {
+        if (e.target === this) closeDeleteConfirm();
+    });
+</script>
+
+{% endblock %}

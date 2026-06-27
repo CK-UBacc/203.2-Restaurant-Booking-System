@@ -4,7 +4,7 @@ Route blueprints for the admin dashboard pages
 
 from flask import Blueprint, session, redirect, url_for, render_template, request, flash
 from .models import database, Table, Booking, TimeSlot, RestaurantSettings
-from datetime import datetime
+import datetime
 import calendar as cal_module
 
 #--------------------------------------------------
@@ -18,7 +18,7 @@ dashboard = Blueprint("dashboard", __name__)
 
 # Dashboard overview function name needed to be changed from dashboard to dashboard index as dashboard is now being used for the blueprint name
 # This will cause problems but aeugh.
-@dashboard.route("/", methods=["GET"])
+@dashboard.route("", methods=["GET"])
 def dashboardIndex():
     '''Route to dashboard
 
@@ -27,7 +27,7 @@ def dashboardIndex():
     :return render_template: Template for the dashboard with all of the data for it.
     '''
     if not session.get("logged_in"):
-        return redirect(url_for("loginpage"))
+        return redirect(url_for("login.loginpage"))
     
 
     bookings = Booking.query.all()
@@ -63,7 +63,7 @@ def dashboardBookings():
     :return render_template: Template for the manage bookings page with all bookings.
     '''
     if not session.get("logged_in"):
-        return redirect(url_for("loginpage"))
+        return redirect(url_for("login.loginpage"))
     
     bookings = Booking.query.all()
     timeSlots = TimeSlot.query.all()
@@ -111,7 +111,7 @@ def dashboardBookingsAdd():
         print(f"ERROR! {str(e)}")
         flash("Failed to add booking. Please check all fields.", "error")
 
-    return redirect(url_for("dashboardBookings"))
+    return redirect(url_for("dashboard.dashboardBookings"))
 
 @dashboard.route("/bookings/approve/<int:id>", methods=["POST"])
 def dashboardBookingsApprove(id):
@@ -127,7 +127,7 @@ def dashboardBookingsApprove(id):
     except Exception as e:
         print(f"ERROR! {str(e)}")
         flash("Failed to approve booking.", "error")
-    return redirect(url_for("dashboard"))
+    return redirect(url_for("dashboard.dashboardIndex"))
 
 @dashboard.route("/bookings/edit/<int:id>", methods=["POST"])
 def dashboardBookingsEdit(id):
@@ -159,7 +159,7 @@ def dashboardBookingsEdit(id):
     except Exception as e:
         print(f"ERROR! {str(e)}")
         flash("Failed to update booking.", "error")
-    return redirect(url_for("dashboardBookings"))
+    return redirect(url_for("dashboard.dashboardBookings"))
 
 #--------------------------------------------------
 # Restaurant-info management
@@ -173,10 +173,11 @@ def dashboardTables():
     '''Route to the manage tables page of the dashboard.
     Also handles settings POST requests (merged from dashboardSettings).
 
+    :return redirect: Redirects to restaurant-info
     :return render_template: Template for the manage tables page with all tables.
     '''
     if not session.get("logged_in"):
-        return redirect(url_for("loginpage"))
+        return redirect(url_for("login.loginpage"))
     
     settings = RestaurantSettings.query.first()
     if not settings:
@@ -215,7 +216,7 @@ def dashboardTables():
             print(f"ERROR! {str(e)}")
             flash("Failed to save settings.", "error")
 
-        return redirect(url_for("dashboardTables"))
+        return redirect(url_for("dashboard.dashboardTables"))
 
     tables = Table.query.all()
     today = datetime.date.today()
@@ -286,7 +287,7 @@ def dashboardTablesAdd():
     except Exception as e:
         print(f"ERROR! {str(e)}")
         flash("Failed to add table.", "error")
-    return redirect(url_for("dashboardTables"))
+    return redirect(url_for("dashboard.dashboardTables"))
 
 @dashboard.route("/restaurant-info/edit/<int:id>", methods=["POST"])
 def dashboardTablesEdit(id):
@@ -304,7 +305,7 @@ def dashboardTablesEdit(id):
     except Exception as e:
         print(f"ERROR! {str(e)}")
         flash("Failed to update table.", "error")
-    return redirect(url_for("dashboardTables"))
+    return redirect(url_for("dashboard.dashboardTables"))
 
 # Is this even used anymore?
 @dashboard.route("/restaurant-info/toggle/<int:id>", methods=["POST"])
@@ -325,7 +326,7 @@ def dashboardTablesToggle(id):
     except Exception as e:
         print(f"ERROR! {str(e)}")
         flash("Failed to update table status.", "error")
-    return redirect(url_for("dashboardTables"))
+    return redirect(url_for("dashboard.dashboardTables"))
 
 @dashboard.route("/restaurant-info/delete/<int:id>", methods=["POST"])
 def dashboardTablesDelete(id):
@@ -344,6 +345,38 @@ def dashboardTablesDelete(id):
         print(f"ERROR! {str(e)}")
         flash("Failed to delete table.", "error")
     return redirect(url_for("dashboardTables"))
+
+@dashboard.route("/settings/timeslots/add", methods=["POST"])
+def dashboardTimeSlotAdd():
+    try:
+        slot_str = request.form.get("slot") # "HH:MM" from <input type="time">
+        slot = datetime.time.fromisoformat(slot_str)
+        if not TimeSlot.query.get(slot):
+            database.session.add(TimeSlot(slot=slot))
+            database.session.commit()
+            flash("Time slot added.", "success")
+        else:
+            flash("Time slot already exists.", "error")
+    except Exception as e:
+        print(f"ERROR! {str(e)}")
+        flash("Invalid time format.", "error")
+    return redirect(url_for("dashboard.dashboardTables"))
+
+
+@dashboard.route("/settings/timeslots/delete", methods=["POST"])
+def dashboardTimeSlotDelete():
+    try:
+        slot_str = request.form.get("slot") # "HH:MM:SS" from hidden field
+        slot = datetime.time.fromisoformat(slot_str)
+        ts = TimeSlot.query.get(slot)
+        if ts:
+            database.session.delete(ts)
+            database.session.commit()
+            flash("Time slot removed.", "success")
+    except Exception as e:
+        print(f"ERROR! {str(e)}")
+        flash("Failed to remove time slot.", "error")
+    return redirect(url_for("dashboard.dashboardTables"))
 
 #--------------------------------------------------
 # Statistics page

@@ -2,7 +2,7 @@
 
 '''
 
-SQLALCHEMY_DATABASE_URI = "sqlite:///dummy.db"
+SQLALCHEMY_DATABASE_URI = "sqlite:///data.db"
 SLQALCHEMY_TRACK_MODIFICATIONS = False
 SECRET_KEY = "your-secret-key-for-flash-messages" # I forgot what the secret key is but it is super important
 

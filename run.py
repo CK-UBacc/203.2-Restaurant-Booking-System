@@ -9,6 +9,6 @@ from app.models import database
 app = create_app()
 
 if __name__ == "__main__":
-    #initializeDummyDatabase(app, database)
+    initializeDummyDatabase(app, database)
 
     app.run(debug=True)

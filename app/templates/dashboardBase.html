@@ -12,17 +12,19 @@
     <!-- SIDEBAR -->
     <aside class="dash-sidebar">
         <div class="dash-logo">
-            <span>TableFlow</span>
+            <span>{{ restaurant_settings.restaurant_name if restaurant_settings else 'TableFlow' }}</span>
         </div>
 
         <nav class="dash-nav">
-            <a href="{{ url_for('dashboard') }}" class="dash-nav-link {{ 'active' if active == 'overview' else '' }}">Overview</a>
-            <a href="{{ url_for('dashboardBookings') }}" class="dash-nav-link {{ 'active' if active == 'bookings' else '' }}">Manage Bookings</a>
-            <a href="{{ url_for('dashboardTables') }}" class="dash-nav-link {{ 'active' if active == 'tables' else '' }}">Manage Tables</a>
+            <a href="{{ url_for('dashboard.dashboardIndex') }}"           class="dash-nav-link {{ 'active' if active == 'overview'  else '' }}">Overview</a>
+            <a href="{{ url_for('dashboard.dashboardBookings') }}"   class="dash-nav-link {{ 'active' if active == 'bookings'  else '' }}">Manage Bookings</a>
+            <a href="{{ url_for('dashboard.dashboardTables') }}"     class="dash-nav-link {{ 'active' if active == 'tables'    else '' }}">Manage Restaurant Info</a>
+            <a href="{{ url_for('dashboard.dashboardStatistics') }}" class="dash-nav-link {{ 'active' if active == 'statistics' else '' }}">Statistics</a>
         </nav>
 
         <div class="dash-sidebar-footer">
-            <a href="{{ url_for('index') }}" class="dash-logout">Back to site</a>
+            <a href="{{ url_for('view.index') }}" class="dash-logout">Back to site</a>
+            <a href="{{ url_for('login.loginpage') }}" class="dash-logout dash-logout-btn">Log out</a>
         </div>
     </aside>
 
@@ -33,13 +35,13 @@
                 <h1>{% block heading %}Dashboard{% endblock %}</h1>
                 <p class="dash-subtitle">{% block subtitle %}{% endblock %}</p>
             </div>
-            <div class="dash-user">
+            <a href="{{ url_for('login.logout') }}" class="dash-user">
                 <div class="dash-avatar">A</div>
                 <div>
                     <strong>Admin</strong>
-                    <small>Restaurant #{{ id }}</small>
+                    <small>{{ restaurant_settings.restaurant_name if restaurant_settings else 'Restaurant' }}</small>
                 </div>
-            </div>
+            </a>
         </header>
 
         <main>

@@ -4,7 +4,7 @@ from .models import User
 login = Blueprint("login", __name__)
 
 @login.route("/loginpage", methods=["GET","POST"])
-def loginpage():
+def loginpage(): # This function name case is fucked but changin it will be a headache
     if request.method == "POST":
 
         username = request.form.get("AdminUsername")
@@ -23,9 +23,9 @@ def loginpage():
 
             session.permanent = remember_me
 
-            return redirect(url_for("dashboard"))
+            return redirect(url_for("dashboard.dashboardIndex"))
         
-        return render_template("loginpage.html",
+        return render_template("login.loginpage.html",
                                error="Incorrect Username Or Password"
             )
        
@@ -35,4 +35,4 @@ def loginpage():
 def logout():
     session.clear
 
-    return redirect(url_for("loginpage"))
+    return redirect(url_for("login.loginpage"))
