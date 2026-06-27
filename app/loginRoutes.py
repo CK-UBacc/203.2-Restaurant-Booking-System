@@ -25,7 +25,7 @@ def loginpage(): # This function name case is fucked but changin it will be a he
 
             return redirect(url_for("dashboard.dashboardIndex"))
         
-        return render_template("login.loginpage.html",
+        return render_template("loginpage.html",
                                error="Incorrect Username Or Password"
             )
        
