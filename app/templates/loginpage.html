@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login · TableFlow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-page">
+
+    <div class="login-card">
+    
+        <img src="{{ url_for('static', filename='tableflowlogo.png') }}" class="logo">
+    
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-stack" style="margin-bottom: 1rem;">
+            {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('login.loginpage') }}" class="login-form">
+            <div class="login-field">
+                <label for="AdminUsername">Username</label>
+                <input
+                    type="text"
+                    id="AdminUsername"
+                    name="AdminUsername"
+                    placeholder="Enter your username"
+                    required
+                    autocomplete="username"
+                >
+            </div>
+
+            <div class="login-field">
+                <label for="Adminpassword">Password</label>
+                <input
+                    type="password"
+                    id="Adminpassword"
+                    name="Adminpassword"
+                    placeholder="Enter your password"
+                    required
+                    autocomplete="current-password"
+                >
+            </div>
+
+            <div class="rememberme-container">
+                <input type="checkbox" id="rememberme" name="remember_me">
+                <label for="rememberme">Remember me</label>
+            </div>
+
+            <button type="submit" class="login-btn">Sign in</button>
+
+           
+        </form>
+    </div>
+    
+</body>
+</html>
