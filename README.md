@@ -31,3 +31,46 @@ It is designed to
 
 ## How to Use
 
+## Project structure
+```
+203.2-Restaurant-Booking-System/
+│   .gitattributes
+│   .gitignore
+│   config.py
+│   install-dependencies.bat
+│   README.md
+│   run.py
+│   run_dev_server.bat
+│   
+└───app
+    │   bookingRoutes.py
+    │   dashboardRoutes.py
+    │   demoRoutes.py
+    │   errorRoutes.py
+    │   important.py
+    │   loginRoutes.py
+    │   models.py
+    │   routes.py
+    │   __init__.py
+    │   
+    ├───static
+    │       bookingstyle.css
+    │       style.css
+    │       tableflowlogo.png
+    │       
+    └───templates
+            accountsettings.html
+            booking.html
+            bookingSuccess.html
+            dashboardBase.html
+            dashboardBookings.html
+            dashboardOverview.html
+            dashboardSettings.html
+            dashboardStatistics.html
+            dashboardTables.html
+            error.html
+            indexDemo.html
+            indexMain.html
+            loginpage.html
+            
+
