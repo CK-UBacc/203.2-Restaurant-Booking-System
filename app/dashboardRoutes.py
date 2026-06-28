@@ -351,6 +351,12 @@ def dashboardTablesDelete(id): #Deleted table selected by the admin. from the ex
 
 @dashboard.route("/settings/timeslots/add", methods=["POST"])
 def dashboardTimeSlotAdd(): #Adds a new time slot to the restuaruants settings
+    '''Adds a new time slot to the restaurant booking system.
+
+    Rejects duplicate time slots if the same slot already exists in the database.
+
+    :return redirect: Redirects to the restaurant-info dashboard.
+    '''
     try:
         slot_str = request.form.get("slot") # "HH:MM" from <input type="time">
         slot = datetime.time.fromisoformat(slot_str)
@@ -368,6 +374,12 @@ def dashboardTimeSlotAdd(): #Adds a new time slot to the restuaruants settings
 
 @dashboard.route("/settings/timeslots/delete", methods=["POST"])
 def dashboardTimeSlotDelete(): #Removes and existing time slot from the restaurants settings
+    '''Removes an existing time slot from the restaurant booking system.
+
+    If the slot does not exist in the database the request is silently ignored.
+
+    :return redirect: Redirects to the restaurant-info dashboard.
+    '''
     try:
         slot_str = request.form.get("slot") # "HH:MM:SS" from hidden field
         slot = datetime.time.fromisoformat(slot_str)
