@@ -8,23 +8,23 @@ It is designed to streamline the booking reservation process into a single dashb
  
 ## Features
  
-Manage Bookings (Edit and change status)
+- Manage Bookings (Edit and change status)
 
-Manage Tables (Add and remove tables to match your restaurant layout)
+- Manage Tables (Add and remove tables to match your restaurant layout)
 
-Admin Login (Admin Dashboard Login Connected to the database)
+- Admin Login (Admin Dashboard Login Connected to the database)
 
-Email Confirmations (Upon booking with a valid email address a booking confirmation is sent to you via email)
+- Email Confirmations (Upon booking with a valid email address a booking confirmation is sent to you via email)
 
-Manage restaurant hours ( Add, remove and edit restaurant open hours)
+- Manage restaurant hours ( Add, remove and edit restaurant open hours)
 
-Set new password ( Set a new password in account settings which will update in the database)
+- Set new password ( Set a new password in account settings which will update in the database)
 
-Admin Dashboard ( A dashboard that allows you to manage all other features from a single place)
+- Admin Dashboard ( A dashboard that allows you to manage all other features from a single place)
 
-Booking Form ( Booking form that can be contained in a iframe on the main restaurants website)
+- Booking Form ( Booking form that can be contained in a iframe on the main restaurants website)
 
-Statistics ( Monitor approval rates, Status breakdown for each month to adjust your restaurants open times)
+- Statistics ( Monitor approval rates, Status breakdown for each month to adjust your restaurants open times)
  
  
 ## Tech Stack
