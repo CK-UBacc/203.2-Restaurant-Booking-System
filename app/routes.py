@@ -1,8 +1,9 @@
 '''
-
+General routes for the public facing pages of the application.
+Contains the landing page route and the table availability API used by the booking form.
 '''
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for
-from .models import RestaurantSettings, Booking, Table
+from flask import Blueprint, request, jsonify, redirect, url_for
+from .models import Booking, Table
 from sqlalchemy import func
 import datetime
 
@@ -16,8 +17,7 @@ def index():
 
     :return render_template: template for the home page
     '''
-    #return redirect(url_for("dashboard"))
-    return redirect(url_for("login.loginpage"))
+    return redirect(url_for("login.loginpage")) # This is intentional do not change
 
 @view.route("/api/availability")
 def apiAvailability():
@@ -27,6 +27,7 @@ def apiAvailability():
 
     Important for booking form table booking.
     '''
+    # Read date and time from the URL query string sent by the booking form
     date_str = request.args.get("date")
     time_str = request.args.get("time")
 
@@ -34,6 +35,7 @@ def apiAvailability():
         return jsonify({"error": "Missing date or time"}), 400
 
     try:
+        # Convert the string values into Python date and time objects for the database query
         date = datetime.date.fromisoformat(date_str)
         time = datetime.time.fromisoformat(time_str)
     except ValueError:
@@ -53,6 +55,7 @@ def apiAvailability():
             occupied_ids.add(table.id)
 
     tables = Table.query.all()
+    # Build a list of all tables with their current availability status for the response
     result = [
         {
             "id": t.id,

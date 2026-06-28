@@ -1,0 +1,38 @@
+{% extends "dashboardBase.html" %}
+
+{% block title %}Account Settings{% endblock %}
+
+{% block heading %}Account Settings{% endblock %}
+{% block subtitle %}Manage your account settings{% endblock %}
+
+{% block content %}
+
+
+<!--Change Account Password/Settings-->
+<section class="dash-card">
+<div class="dash-card-header">
+    <h2>Change Password</h2>
+</div>
+
+<form method="post" action="{{ url_for('dashboard.dashboardChangePassword') }}" class="dash-form">
+    <label>Current Password</label>
+    <input type="password" name="current_password" required>
+    <label>New Password</label>
+    <input type="password" name="new_password" required>
+    <label>Confirm New Password</label>
+    <input type="password" name="confirm_password" required>
+
+    <div class="settings-save">
+        <button type="submit" class="btn btn-primary">
+            Saved Changed Password
+        </button>
+
+    </div>
+
+
+</form>
+</section>
+
+
+
+{% endblock %}

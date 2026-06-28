@@ -23,6 +23,10 @@
         {% endif %}
         {% endwith %}
 
+        {% if error %}
+        <div class="flash flash-error">{{ error }}</div>
+        {% endif %}
+
         <form method="POST" action="{{ url_for('login.loginpage') }}" class="login-form">
             <div class="login-field">
                 <label for="AdminUsername">Username</label>

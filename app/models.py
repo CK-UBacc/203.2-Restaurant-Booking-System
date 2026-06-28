@@ -2,6 +2,7 @@
 Creates the database object and
 Contains definitions for all of the database tables.
 '''
+#from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 import datetime
 
@@ -117,3 +118,37 @@ class User(database.Model):
     username = database.Column(database.String(50), unique=True, nullable=False )
     password = database.Column(database.String(50), nullable=False)
 
+def createDatabase(app):
+    '''Creates a new database if none exists.
+
+    :param Flask app: The current flask app.
+
+    :return none:
+    '''
+
+    with app.app_context():
+        # database.create_all() skips modifying existing tables so we don't need to check if the database exists.
+        # it will either create the database and table or do nothing
+        database.create_all()
+
+        # Insert default data if table is empty
+        if (RestaurantSettings.query.first() == None):
+            database.session.add(RestaurantSettings(
+                restaurant_name   = "RESTAURANT_NAME",
+                address           = "",
+                phone             = "",
+                email             = "",
+                description       = "DEFAULT_DESCRIPTION",
+                max_party_size    = 8,
+                max_advance_days  = 30,
+                min_advance_hours = 2,
+                open_time         = datetime.time(10, 0),
+                close_time        = datetime.time(22, 0),
+                days_open         = "1111100"
+            ))
+
+        # Insert default admin login if no admin login exists (essential for loging in)
+        if (User.query.first() == None):
+            database.session.add(User(username="admin123", password="admin123"))
+        
+        database.session.commit()
