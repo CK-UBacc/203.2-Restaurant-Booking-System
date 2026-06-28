@@ -47,6 +47,6 @@ def loginpage(): # This function name case is fucked but changin it will be a he
 @login.route("/Logout")
 def logout():
     # Remove all session data so the user is no longer considered logged in
-    session.clear
+    session.clear()
 
     return redirect(url_for("login.loginpage"))
