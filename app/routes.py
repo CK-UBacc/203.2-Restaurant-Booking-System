@@ -17,8 +17,7 @@ def index():
 
     :return render_template: template for the home page
     '''
-    # Render the main landing page shown when the app first loads
-    return render_template("indexMain.html")
+    return redirect(url_for("login.loginpage")) # This is intentional do not change
 
 @view.route("/api/availability")
 def apiAvailability():

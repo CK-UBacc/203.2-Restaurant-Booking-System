@@ -12,36 +12,34 @@ def loginpage(): # This function name case is fucked but changin it will be a he
     # GET request shows the empty login form
     # POST request reads submitted credentials and checks them against the database
     if request.method == "POST":
+        try:
+            username = request.form.get("AdminUsername")
+            password = request.form.get("Adminpassword")
 
-        # Read the username and password submitted from the login form
-        username = request.form.get("AdminUsername")
-        password = request.form.get("Adminpassword")
+            remember_me = request.form.get("remember_me") == "on"
 
-        # Check if the remember me checkbox was ticked by the user
-        remember_me = request.form.get("remember_me") == "on"
+            user = User.query.filter_by(
+                username=username,
+                password=password
+            ).first()
 
-        # Search the database for a user record matching the entered username and password
-        user = User.query.filter_by(
-            username=username,
-            password=password
-        ).first()
+            if user:
+                session["logged_in"] = True
+                session["username"] = user.username
 
-        if user:
-            # Store login state and username in the session so other routes can check it
-            session["logged_in"] = True
-            session["username"] = user.username
+                session.permanent = remember_me
 
-            # If remember me is on the session will survive after the browser is closed
-            session.permanent = remember_me
-
-            return redirect(url_for("dashboard.dashboardIndex"))
-
-        # No matching user found so show the login page again with an error message
-        return render_template("loginpage.html",
-                               error="Incorrect Username Or Password"
-            )
-
-    # Default GET request just shows the login form with no error
+                return redirect(url_for("dashboard.dashboardIndex"))
+            
+            return render_template("loginpage.html",
+                                   error="Incorrect Username Or Password"
+                )
+        
+        except Exception as e:
+            return render_template("loginpage.html",
+                                   error=f"An error has occured: {e}"
+                )
+            
     return render_template("loginpage.html")
 
 @login.route("/Logout")
