@@ -6,7 +6,6 @@ It is designed to
 
 ## Features
 
-
 ## Tech Stack
 
 ## Installation and Setup
@@ -27,8 +26,6 @@ It is designed to
   2. ```bash
      pip install flask, flask_sqlalchemy, flask_mail
      ```
-
-
 ## How to Use
 
 ## Project structure
@@ -42,7 +39,7 @@ It is designed to
 │   run.py
 │   run_dev_server.bat
 │   
-└───app
+└───app/
     │   bookingRoutes.py
     │   dashboardRoutes.py
     │   demoRoutes.py
@@ -53,12 +50,12 @@ It is designed to
     │   routes.py
     │   __init__.py
     │   
-    ├───static
+    ├───static/
     │       bookingstyle.css
     │       style.css
     │       tableflowlogo.png
     │       
-    └───templates
+    └───templates/
             accountsettings.html
             booking.html
             bookingSuccess.html
@@ -72,5 +69,5 @@ It is designed to
             indexDemo.html
             indexMain.html
             loginpage.html
-            
+```
 
