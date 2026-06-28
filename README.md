@@ -1,13 +1,38 @@
 # Tableflow - Restaurant booking stystem
 
 ## Overview
+
 Table flow is a flask based web booking management system to be hosted on your servers.
-It is designed to 
 
+It is designed to streamline the booking reservation process into a single dashboard, which allows you to keep track of your reservations from a single hub, Reducing Human error and downtime between reservations while going completely online in a growing digital world
+ 
 ## Features
+ 
+Manage Bookings (Edit and change status)
 
+Manage Tables (Add and remove tables to match your restaurant layout)
+
+Admin Login (Admin Dashboard Login Connected to the database)
+
+Email Confirmations (Upon booking with a valid email address a booking confirmation is sent to you via email)
+
+Manage restaurant hours ( Add, remove and edit restaurant open hours)
+
+Set new password ( Set a new password in account settings which will update in the database)
+
+Admin Dashboard ( A dashboard that allows you to manage all other features from a single place)
+
+Booking Form ( Booking form that can be contained in a iframe on the main restaurants website)
+
+Statistics ( Monitor approval rates, Status breakdown for each month to adjust your restaurants open times)
+ 
+ 
 ## Tech Stack
 
+Flask, SQL Alchemy For Backend
+ 
+HTML,CSS,Java Script For Frontend
+ 
 ## Installation and Setup
 ### Prerequisites
 - python3.12 or higher installed
