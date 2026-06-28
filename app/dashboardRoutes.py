@@ -347,7 +347,7 @@ def dashboardTablesDelete(id): #Deleted table selected by the admin. from the ex
     except Exception as e:
         print(f"ERROR! {str(e)}")
         flash("Failed to delete table.", "error")
-    return redirect(url_for("dashboardTables"))
+    return redirect(url_for("dashboard.dashboardTables"))
 
 @dashboard.route("/settings/timeslots/add", methods=["POST"])
 def dashboardTimeSlotAdd(): #Adds a new time slot to the restuaruants settings
