@@ -27,7 +27,82 @@ It is designed to
     ```bash
      pip install flask, flask_sqlalchemy, flask_mail
      ```
-## How to Use
+
+### How to Run (Recommended Automatic Setup)
+
+This method installs all dependencies automatically and requires no manual pip commands
+
+1. Download or clone this project to your computer.
+2. Open the project folder.
+3. Double-click the file named "run_dev_server"
+
+The script will do the following on first run:
+- Create an isolated Python environment in a folder called ".venv"
+- Install all required packages automatically from requirements.txt
+- Start the application server
+
+On every run after the first, it will skip the setup and go straight to starting the server
+
+4. Once the server is running, open a web browser and go to: http://localhost:5000
+
+5. To stop the server, close the terminal window that opened, or press Ctrl+C inside it.
+
+### How to Run (Manually Command Line)
+
+If you prefer to run the app manually or the batch file does not work:
+
+1. Open a terminal and navigate to the project folder
+
+2. Create a virtual environment:
+
+   python -m venv .venv
+
+3. Activate the virtual environment:
+
+   .venv\Scripts\activate
+
+4. Install all required packages:
+
+   pip install -r requirements.txt
+
+5. Start the application:
+
+   python run.py
+
+6. Open a browser and go to http://localhost:5000
+
+### Pages and URLs
+
+The following pages are available once the app is running:
+
+   http://localhost:5000/                           :Landing page
+   http://localhost:5000/booking                    :Public booking form for customers
+   http://localhost:5000/demo                       :Demo version of the booking form
+   http://localhost:5000/demo/example               :Demo version of how real app look
+   http://localhost:5000/loginpage                  :Admin login page
+   http://localhost:5000/dashboard                  :Admin dashboard overview (requires login)
+   http://localhost:5000/dashboard/bookings         :Manage all bookings
+   http://localhost:5000/dashboard/restaurant-info  :Manage tables and restaurant settings
+   http://localhost:5000/dashboard/statistics       :Booking statistics
+
+### Default Admin Login
+
+When the application runs for the first time it creates a default admin account:
+
+   Username: admin123
+   Password: admin123
+
+It is strongly recommended to change this password after your first login through the
+Account Settings page in the dashboard.
+
+### Packages Used
+
+   Flask 3.1.3            : Web framework
+   Flask-SQLAlchemy 3.1.1 : Database management
+   Flask-Mail 0.10.0      : Email notifications
+   Waitress 3.0.2         : Production web server
+   Werkzeug 3.1.8         : Utilities (included with Flask)
+
 
 ## Project structure
 ```
