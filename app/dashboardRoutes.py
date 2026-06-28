@@ -3,7 +3,7 @@ Route blueprints for the admin dashboard pages
 '''
 
 from flask import Blueprint, session, redirect, url_for, render_template, request, flash
-from .models import database, Table, Booking, TimeSlot, RestaurantSettings
+from .models import database, Table, Booking, TimeSlot, RestaurantSettings, User
 import datetime
 import calendar as cal_module
 
@@ -496,4 +496,32 @@ def dashboardStatistics(): #Displays booking stats, Such as total,group size etc
 #--------------------------------------------------
 # Settings page
 #--------------------------------------------------
+
+
+
+#-------------------------------------------------
+#Save Password changes 
+#-------------------------------------------------
+
+@dashboard.route("/change-password", methods=["POST"])
+def dashboardChangePassword():
+    current_password = request.form.get("current_password")
+    new_password = request.form.get("new_password")
+    confirm_password = request.form.get("confirm_password")
+
+    user = User.query.filter_by(username=session["username"]).first()
+
+    if user.password != current_password:
+        flash("Current Password is Incorrect")
+        return redirect(url_for("dashboard.dashboardTables"))
+    
+    if new_password != confirm_password:
+        flash("Passwords do not match")
+        return redirect(url_for("dashboard.dashboardTables"))
+    
+    user.password = new_password
+    database.session.commit()
+
+    flash("Password has been changed")
+    return redirect(url_for("dashboard.dashboardTables"))
 
