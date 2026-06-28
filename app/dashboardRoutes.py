@@ -519,6 +519,10 @@ def dashboardChangePassword():
         flash("Current Password is Incorrect")
         return redirect(url_for("dashboard.accountsettings"))
     
+    if new_password == user.password:
+        flash("New Password Cannot Match Existing Password")
+        return redirect(url_for("dashboard.accountsettings"))
+    
     if new_password != confirm_password:
         flash("Passwords do not match")
         return redirect(url_for("dashboard.accountsettings"))
