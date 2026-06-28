@@ -95,15 +95,6 @@ When the application runs for the first time it creates a default admin account:
 It is strongly recommended to change this password after your first login through the
 Account Settings page in the dashboard.
 
-### Packages Used
-
-- Flask 3.1.3            : Web framework
-- Flask-SQLAlchemy 3.1.1 : Database management
-- Flask-Mail 0.10.0      : Email notifications
-- Waitress 3.0.2         : Production web server
-- Werkzeug 3.1.8         : Utilities (included with Flask)
-
-
 ## Project structure
 ```
 203.2-Restaurant-Booking-System/
