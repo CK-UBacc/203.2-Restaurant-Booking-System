@@ -8,7 +8,7 @@ from .models import User
 login = Blueprint("login", __name__)
 
 @login.route("/loginpage", methods=["GET","POST"])
-def loginpage(): # This function name case is fucked but changin it will be a headache
+def loginpage(): # This function name case is wrong but changin it will be a headache
     # GET request shows the empty login form
     # POST request reads submitted credentials and checks them against the database
     if request.method == "POST":
