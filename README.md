@@ -14,12 +14,12 @@ It is designed to
 - git (for cloneing and installing the repository)
 
 ### Steps
-- Clone repository:
+-1 Clone repository:
   ```bash
   git clone https://github.com/CK-UBacc/203.2-Restaurant-Booking-System.git
   cd 203.2-Restaurant-Booking-System
   ```
-- Install dependencies.
+-2 Install dependencies.
   
   There are two options for installing dependencies
   1. run install-dependencies.bat after installing python
