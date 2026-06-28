@@ -9,6 +9,14 @@ import datetime
 demo = Blueprint("demo", __name__)
 
 @demo.route("")
+def indexDemo():
+    '''
+    Route to restaurant demo page.
+    '''
+    restaurant_settings = RestaurantSettings.query.first()
+    return render_template('indexMain.html', restaurant_settings=restaurant_settings)
+
+@demo.route("/example")
 def exampleRestaurant():
     '''
     Shows what a restaurant booking page looks like using TableFlow.
