@@ -2,8 +2,8 @@
 General routes for the public facing pages of the application.
 Contains the landing page route and the table availability API used by the booking form.
 '''
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for
-from .models import RestaurantSettings, Booking, Table
+from flask import Blueprint, request, jsonify, redirect, url_for
+from .models import Booking, Table
 from sqlalchemy import func
 import datetime
 

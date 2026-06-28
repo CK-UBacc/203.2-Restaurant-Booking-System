@@ -3,7 +3,7 @@ Constructs the flask object to return to "run.py"
 '''
 
 from flask import Flask
-from .models import database, RestaurantSettings
+from .models import database
 from .bookingRoutes import mail
 
 def create_app():
@@ -25,15 +25,6 @@ def create_app():
     database.init_app(app)
     mail.init_app(app)
 
-    '''
-    @app.context_processor
-    def inject_settings():
-        try:
-            settings = RestaurantSettings.query.first()
-        except Exception:
-            settings = None
-        return dict(restaurant_settings=settings)
-    '''
     # Import routes into app
     # I hate how incosistent these names are but it is the quickest way of doing things without rewriting more of the app than I wan't to
     from .loginRoutes import login
