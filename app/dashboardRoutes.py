@@ -517,15 +517,15 @@ def dashboardChangePassword():
 
     if user.password != current_password:
         flash("Current Password is Incorrect")
-        return redirect(url_for("dashboard.dashboardTables"))
+        return redirect(url_for("dashboard.accountsettings"))
     
     if new_password != confirm_password:
         flash("Passwords do not match")
-        return redirect(url_for("dashboard.dashboardTables"))
+        return redirect(url_for("dashboard.accountsettings"))
     
     user.password = new_password
     database.session.commit()
 
     flash("Password has been changed")
-    return redirect(url_for("dashboard.dashboardTables"))
+    return redirect(url_for("dashboard.accountsettings"))
 
