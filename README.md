@@ -75,15 +75,15 @@ If you prefer to run the app manually or the batch file does not work:
 
 The following pages are available once the app is running:
 
-/  :Landing page
-/booking :Public booking form for customers
-/demo :Demo version of the booking form
-/demo/example :Demo version of how real app look
-/loginpage :Admin login page
-/dashboard :Admin dashboard overview (requires login)
-/dashboard/bookings :Manage all bookings
-/dashboard/restaurant-info  :Manage tables and restaurant settings
-/dashboard/statistics  :Booking statistics
+- /  :Landing page
+- /booking :Public booking form for customers
+- /demo :Demo version of the booking form
+- /demo/example :Demo version of how real app look
+- /loginpage :Admin login page
+- /dashboard :Admin dashboard overview (requires login)
+- /dashboard/bookings :Manage all bookings
+- /dashboard/restaurant-info  :Manage tables and restaurant settings
+- /dashboard/statistics  :Booking statistics
 
 ### Default Admin Login
 
