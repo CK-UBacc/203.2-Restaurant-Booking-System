@@ -21,7 +21,7 @@ def create_app():
     app.permanent_session_lifetime = timedelta(days=30) #Tells flask how long a single session can be live for
 
 
-    # Import database into app
+    # Bind the database and mail extensions to this app instance
     database.init_app(app)
     mail.init_app(app)
 
@@ -43,8 +43,10 @@ def create_app():
     from .errorRoutes import errorRoute
     from .demoRoutes import demo
 
+    # Register each blueprint with the app
+    # dashboard and demo use a url_prefix so all their routes start with /dashboard and /demo respectively
     app.register_blueprint(login)
-    app.register_blueprint(dashboard, url_prefix="/dashboard") 
+    app.register_blueprint(dashboard, url_prefix="/dashboard")
     app.register_blueprint(bookingRoute)
     app.register_blueprint(view)
     app.register_blueprint(errorRoute)
