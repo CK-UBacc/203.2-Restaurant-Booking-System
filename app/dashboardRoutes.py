@@ -500,8 +500,12 @@ def dashboardStatistics(): #Displays booking stats, Such as total,group size etc
 
 
 #-------------------------------------------------
-#Save Password changes 
+#Save Password changes & Account Settings Route
 #-------------------------------------------------
+
+@dashboard.route("/accountsettings")
+def accountsettings():
+    return render_template("accountsettings.html", active="Accountsettings")
 
 @dashboard.route("/change-password", methods=["POST"])
 def dashboardChangePassword():
