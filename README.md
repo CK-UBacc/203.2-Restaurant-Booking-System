@@ -16,7 +16,7 @@ It is designed to
 
 ### Steps
 - Clone repository:
-  '''bash
+  ```bash
   git clone https://github.com/CK-UBacc/203.2-Restaurant-Booking-System.git
   cd 203.2-Restaurant-Booking-System
-  '''
+  ```
