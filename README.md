@@ -20,10 +20,14 @@ It is designed to
   git clone https://github.com/CK-UBacc/203.2-Restaurant-Booking-System.git
   cd 203.2-Restaurant-Booking-System
   ```
-- Install dependencies
+- Install dependencies.
+  
   There are two options for installing dependencies
   1. run install-dependencies.bat after installing python
   2. ```bash
      pip install flask, flask_sqlalchemy, flask_mail
      ```
-- 
+
+
+## How to Use
+
