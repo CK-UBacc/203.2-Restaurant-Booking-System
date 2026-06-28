@@ -22,8 +22,8 @@ It is designed to
 2. Install dependencies.
   
   There are two options for installing dependencies
-  a. run install-dependencies.bat after installing python
-  b. ```bash
+  - run install-dependencies.bat after installing python
+  - ```bash
      pip install flask, flask_sqlalchemy, flask_mail
      ```
 ## How to Use
