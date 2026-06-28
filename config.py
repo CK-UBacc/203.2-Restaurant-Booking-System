@@ -1,10 +1,19 @@
 '''
 
 '''
+import secrets
+def generateSecretKey():
+    '''Generates a string for use as a secret key
+
+    I don't know if this is a good way of going about this but I didn't wan't a hard coded secret key
+    
+    :return string: returns a string for your secret key
+    '''
+    return secrets.token_hex()
 
 SQLALCHEMY_DATABASE_URI = "sqlite:///data.db"
-SLQALCHEMY_TRACK_MODIFICATIONS = False
-SECRET_KEY = "your-secret-key-for-flash-messages" # I forgot what the secret key is but it is super important
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+SECRET_KEY = generateSecretKey() # For a manual secret key replace "generateSecretKey()" with a key of your choice in quote marks
 
 # Email config 
 MAIL_SERVER = "smtp.gmail.com"

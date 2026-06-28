@@ -294,9 +294,9 @@
 
         document.getElementById('editTableTitle').textContent = 'Table ' + id;
         document.getElementById('editTableSeats').value       = seats;
-        var toggleUrl = '/dashboard/tables/toggle/' + id;
-        document.getElementById('editTableForm').action      = '/dashboard/tables/edit/'   + id;
-        document.getElementById('deleteTableForm').action    = '/dashboard/tables/delete/' + id;
+        var toggleUrl = '/dashboard/restaurant-info/toggle/' + id;
+        document.getElementById('editTableForm').action      = '/dashboard/restaurant-info/edit/'   + id;
+        document.getElementById('deleteTableForm').action    = '/dashboard/restaurant-info/delete/' + id;
 
         /* Status label */
         var labelEl = document.getElementById('editTableStatusLabel');
