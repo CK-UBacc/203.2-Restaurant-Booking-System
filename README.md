@@ -75,15 +75,15 @@ If you prefer to run the app manually or the batch file does not work:
 
 The following pages are available once the app is running:
 
-   http://localhost:5000/                           :Landing page
-   http://localhost:5000/booking                    :Public booking form for customers
-   http://localhost:5000/demo                       :Demo version of the booking form
-   http://localhost:5000/demo/example               :Demo version of how real app look
-   http://localhost:5000/loginpage                  :Admin login page
-   http://localhost:5000/dashboard                  :Admin dashboard overview (requires login)
-   http://localhost:5000/dashboard/bookings         :Manage all bookings
-   http://localhost:5000/dashboard/restaurant-info  :Manage tables and restaurant settings
-   http://localhost:5000/dashboard/statistics       :Booking statistics
+/  :Landing page
+/booking :Public booking form for customers
+/demo :Demo version of the booking form
+/demo/example :Demo version of how real app look
+/loginpage :Admin login page
+/dashboard :Admin dashboard overview (requires login)
+/dashboard/bookings :Manage all bookings
+/dashboard/restaurant-info  :Manage tables and restaurant settings
+/dashboard/statistics  :Booking statistics
 
 ### Default Admin Login
 
