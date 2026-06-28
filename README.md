@@ -21,7 +21,7 @@ It is designed to
   ```
 2. Install dependencies.
   
-  There are two options for installing dependencies
+    There are two options for installing dependencies
   - run "install-dependencies.bat" after installing python
   - Run the following code in the terminal
     ```bash
